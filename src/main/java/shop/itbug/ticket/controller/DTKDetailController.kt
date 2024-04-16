@@ -41,6 +41,8 @@ class DTKDetailController {
     @Schema(name="设置默认账号的参数")
     data class ChangeDefaultAccountParam(@Schema(description = "true: 启用, false: 取消启用") val action: Boolean, @Schema(description = "ID")  val id: Long)
 
+
+    ///
     @PostMapping("/update-default")
     @Operation(summary = "设置默认的账号")
     fun changeDefaultAccount(@RequestBody params: ChangeDefaultAccountParam) : R<Boolean>{

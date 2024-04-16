@@ -2,6 +2,7 @@ package shop.itbug.ticket.dao.blog
 
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.jpa.repository.Query
@@ -14,7 +15,6 @@ import java.util.*
 
 @Repository
 interface BlogDao : JpaRepository<Blog, Long>, JpaSpecificationExecutor<Blog> {
-    fun findByTitle(title: String?): Blog?
     fun findAllByCategory(category: Category?, pageable: Pageable?): Page<Blog>
     fun findByAliasString(alias: String?): Blog?
 
@@ -30,5 +30,6 @@ interface BlogDao : JpaRepository<Blog, Long>, JpaSpecificationExecutor<Blog> {
         nativeQuery = true
     )
     fun getBlogsWithMonths(months: String?): List<MonthBlogModel>
+
 
 }

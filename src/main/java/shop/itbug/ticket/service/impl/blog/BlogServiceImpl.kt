@@ -29,6 +29,8 @@ import kotlin.jvm.optionals.getOrNull
 @Service
 @CacheConfig(cacheNames = ["blog"])
 class BlogServiceImpl : BlogService {
+
+
     @Resource
     private lateinit var blogDao: BlogDao
 
@@ -48,7 +50,7 @@ class BlogServiceImpl : BlogService {
      * @return obj
      */
     @CacheEvict(
-        value = [RedisKeys.BLOG_KEY + "all", RedisKeys.BLOG_KEY + "statistics", RedisKeys.BLOG_KEY + "count"],
+        value = [RedisKeys.BLOG_KEY + "all", RedisKeys.BLOG_KEY + "statistics", RedisKeys.BLOG_KEY + "count", RedisKeys.BLOG_KEY + "pageable-select"],
         allEntries = true
     )
     override fun create(title: String, content: String, categoryId: Long): Blog {
@@ -216,13 +218,9 @@ class BlogServiceImpl : BlogService {
      * @param blog 要修改的内容
      * @return 修改后的博客
      */
-    @Caching(
-        evict = [
-            CacheEvict(
-                value = [RedisKeys.BLOG_KEY + "all", RedisKeys.BLOG_KEY + "getMonthBlogsWithMonth", RedisKeys.BLOG_KEY + "pageable-select",RedisKeys.BLOG_KEY + "statistics"],
-                allEntries = true
-            ),
-        ]
+    @CacheEvict(
+        value = [RedisKeys.BLOG_KEY + "pageable-select", RedisKeys.BLOG_KEY + "all", RedisKeys.BLOG_KEY + "getMonthBlogsWithMonth", RedisKeys.BLOG_KEY + "statistics"],
+        allEntries = true
     )
     override fun update(blog: Blog): Blog {
         return blogDao.save(blog)
@@ -298,7 +296,7 @@ class BlogServiceImpl : BlogService {
 
     @Cacheable(value = [RedisKeys.BLOG_KEY + "all"])
     override fun findAll(): List<Blog> {
-        return blogDao.findAll()
+        return blogDao.findAll(Sort.by(Sort.Direction.DESC, "createTime"))
     }
 
     /// 验证

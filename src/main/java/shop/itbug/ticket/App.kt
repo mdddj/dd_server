@@ -10,7 +10,6 @@ import org.springframework.scheduling.annotation.EnableAsync
 import org.springframework.web.servlet.config.annotation.EnableWebMvc
 
 
-
 ///
 @SpringBootApplication
 @ServletComponentScan

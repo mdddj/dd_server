@@ -143,9 +143,7 @@ open class AdminAuthController {
     @PostMapping("/blog-push-new")
     @Operation(summary = "发布新博客")
     fun pushBlog(@RequestBody @Validated params: PushNewBlogParams, bindingResult: BindingResult): Result<Blog> {
-        if (bindingResult.hasErrors()) {
-            throw BizException("参数错误")
-        }
+        bindingResult.verify()
         val tagsSet = HashSet<BlogTag>()
         params.tags.forEach(Consumer { s: String -> tagsSet.add(BlogTag(s)) })
         val save = tagService.save(tagsSet)
