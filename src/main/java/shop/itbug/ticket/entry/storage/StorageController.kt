@@ -33,7 +33,7 @@ class StorageController {
     }
 
 
-    //
+    // 
     @PostMapping("/upload")
     @Operation(summary = "上传一个文件")
     fun uploadTest(@Parameter(description = "文件") file: MultipartFile,httpServletRequest: HttpServletRequest,@GetLoginUser user: User): Result<FileInfo?> {

@@ -95,5 +95,6 @@ data class DtaokeBaseProduct (
     val reimgs: String? = null,
     val detailPics: String? = null,
     val isSubdivision: Int? = null,
-    val bizSceneId: Int? = null
+    val bizSceneId: Int? = null,
+    val realPostFee: Int? = null,
 )

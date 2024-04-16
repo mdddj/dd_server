@@ -38,7 +38,6 @@ class DTKServiceImpl : DTKDetailService {
      * @param dtkDetail 操作对象
      * @return 类对象
      */
-    @Cacheable(RedisKeys.DTK + "info", key = "#dtkDetail.id")
     override fun saveOne(dtkDetail: DTKDetail): DTKDetail {
         if (dtkDetail.id != null) {
             return dtkDetailDao.save(dtkDetail)
@@ -53,12 +52,6 @@ class DTKServiceImpl : DTKDetailService {
     }
 
 
-    @Caching(
-        evict = [
-            CacheEvict(RedisKeys.DTK+"default", allEntries = true),
-            CacheEvict(RedisKeys.DTK+"info", key = "#id")
-        ]
-    )
     override fun deleteById(id: Long) {
         dtkDetailDao.deleteById(id)
     }
@@ -70,12 +63,6 @@ class DTKServiceImpl : DTKDetailService {
      * @param id     主键
      * @return 是否设置成功
      */
-    @Caching(
-        evict = [
-            CacheEvict(RedisKeys.DTK+"default", allEntries = true),
-            CacheEvict(RedisKeys.DTK+"info", key = "#id")
-        ]
-    )
     override fun openAndCloseOne(action: Boolean, id: Long) {
         //如果存在默认的启用账号,则需要取消,因为只能存在一个默认的账号
         if (action) {
@@ -96,7 +83,6 @@ class DTKServiceImpl : DTKDetailService {
      * @param id 主键
      * @return 类对象
      */
-    @Cacheable(RedisKeys.DTK + "info", key = "#id")
     override fun findById(id: Long): DTKDetail? {
         val byId = dtkDetailDao.findById(id)
         return byId.map { dtkDetail: DTKDetail? ->
@@ -111,7 +97,6 @@ class DTKServiceImpl : DTKDetailService {
      *
      * @return 类对象, null表示没有设置
      */
-    @Cacheable(RedisKeys.DTK + "default")
     override fun findDefault(): DTKDetail? {
         val allBySelect = dtkDetailDao.findAllBySelectDefault(true)
         return if (allBySelect.isEmpty()) {
@@ -156,3 +141,5 @@ class DTKServiceImpl : DTKDetailService {
 
 
 }
+
+///

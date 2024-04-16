@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val sbVersion = "3.2.4"
@@ -76,6 +77,7 @@ tasks.withType<JavaCompile> {
 tasks.withType<KotlinCompile> {
     compilerOptions {
         incremental = true
+        jvmTarget = JvmTarget.JVM_21
     }
 }
 
