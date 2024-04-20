@@ -4,6 +4,17 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+
+*.ipr
+*.iws
+*.iml
+
+.mvn
+.idea
+build
+.gradle
+
+
 ### STS ###
 .apt_generated
 .classpath
@@ -38,3 +49,11 @@ build/
 
 ### ig file 
 src/main/resources/application-pro.yml
+
+
+## 管理端
+dd_server_admin/.vscode
+dd_server_admin/.husky
+dd_server_admin/src/.umi-production
+dd_server_admin/src/.umi
+dd_server_admin/dist

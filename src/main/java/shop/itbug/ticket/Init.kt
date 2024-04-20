@@ -139,8 +139,9 @@ class InitAppRunner : ApplicationRunner {
     private fun initAdminAccount() {
         val adminAccounts = userService.findUsersByType(100)
         if (adminAccounts.isEmpty()) {
-            val user = userService.createAdminAccount("admin", "123456", "413153189@qq.com")
+            val user = userService.createAdminAccount("admin", "123456", "")
             roleService.addRole(user){ it.name == "admin" }
+            log().info("管理员账号创建成功,用户名:admin,密码:123456")
         }
 
     }
