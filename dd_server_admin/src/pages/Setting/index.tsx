@@ -4,6 +4,7 @@ import { Tabs, Tab,  } from '@nextui-org/react';
 import { Form, Input, Card, Button } from 'antd';
 import { request } from '@umijs/max';
 import { Result } from '@/types/result';
+import {removeJwtToken} from "@/utils/cache";
 
 ///个人设置页面
 export default function Page() {
@@ -14,6 +15,7 @@ export default function Page() {
     })
     console.log(response)
     if(response.success){
+      removeJwtToken()
       window.location.href = "/login";
     }
   };

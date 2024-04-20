@@ -12,10 +12,11 @@
 
 ##### * 自己编译项目
 ```bash
-sudo docker build -t dd_server:v0.0.2 -f ./Dockerfile .
+sudo docker build -t liangdiandian/dd_server:tagname .
 ```
+`tagname`: 版本号,例子:0.0.1
 
-#### * 使用docker hub 打包好的
+##### * 使用docker hub 打包好的
 
 ```bash
 docker pull liangdiandian/dd_server:latest
@@ -28,15 +29,15 @@ docker pull liangdiandian/dd_server:latest
 docker run --name dd_erver --network=host \
  -p 8082:8082 \
  -p 8083:8083 \
- -e MYSQL_URL=127.0.0.1:3306 \
+ -e MYSQL_URL=1Panel-mysql-Z4Mc:3306 \
  -e MYSQL_DATABASE=test \
  -e MYSQL_USERNAME=root \
  -e MYSQL_PASSWORD=123456 \
- -e REDIS_HOST=127.0.0.1 \
+ -e REDIS_HOST=1Panel-redis-F20g \
  -e REDIS_PORT=6379 \
  -e REDIS_PASSWORD=123456 \
- -v /Users/ldd/.test:/root/.dd \
- dd_server:latest
+ -v /dd-service-config:/root/.dd \
+ liangdiandian/dd_server:0.0.2
 ```
 
 > `latest`: 替换为最新版本
@@ -57,7 +58,7 @@ docker run --name dd_erver --network=host \
 ` -v /Users/ldd/.test:/root/.dd`: 映射配置文件目录到本机
 
 `/Users/ldd/.test`:你的本机目录
-`/root/.dd`:容器存放配置目录
+`/root/.dd`:容器存放配置目录  
 
 ##### 3.端口
 
