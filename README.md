@@ -16,10 +16,11 @@ sudo docker build -t dd_server:v0.0.2 -f ./Dockerfile .
 ```
 
 #### * 使用docker hub 打包好的
+
 ```bash
 docker pull liangdiandian/dd_server:latest
 ```
-
+> `latest`:需要替换为最新版本,可以在[Docker Hub](https://hub.docker.com/search?q=dd_server)查看
 
 ## 3.运行
 
@@ -35,8 +36,10 @@ docker run --name dd_erver --network=host \
  -e REDIS_PORT=6379 \
  -e REDIS_PASSWORD=123456 \
  -v /Users/ldd/.test:/root/.dd \
- dd_server:v0.0.2
+ dd_server:latest
 ```
+
+> `latest`: 替换为最新版本
 
 ##### 1.支持的可配置属性
 
