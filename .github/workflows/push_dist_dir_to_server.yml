@@ -2,7 +2,7 @@ name: 打包上传
 on:
   push:
     branches:
-      - docker
+      - main
 jobs:
   build:
     runs-on: ubuntu-latest
