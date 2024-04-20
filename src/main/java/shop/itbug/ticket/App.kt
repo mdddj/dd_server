@@ -1,5 +1,6 @@
 package shop.itbug.ticket
 
+import com.alibaba.fastjson2.toJSONString
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
@@ -21,5 +22,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc
 class App
 
 fun main(args: Array<String>) {
+    val getenv = System.getenv()
+    println(getenv.toJSONString())
     SpringApplication.run(App::class.java, *args)
 }

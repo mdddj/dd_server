@@ -64,7 +64,7 @@ dependencies {
 }
 
 group = "shop.itbug"
-version = "2.0.0"
+version = "0.0.1"
 description = "梁典典的后台服务"
 
 
