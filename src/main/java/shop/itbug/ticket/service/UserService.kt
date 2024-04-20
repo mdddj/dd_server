@@ -119,4 +119,6 @@ interface UserService  {
 
     fun findByRelationId(relationId: String): User?
 
+    fun updatePassword(user: User,oldPassword: String, newPassword: String)
+
 }

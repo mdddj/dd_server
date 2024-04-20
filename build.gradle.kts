@@ -1,14 +1,14 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val sbVersion = "3.2.4"
+val sbVersion = "3.2.5"
 
 
 plugins {
     `maven-publish`
     idea
     id("org.jetbrains.kotlin.jvm") version "2.0.0-RC1"
-    id("org.springframework.boot") version "3.2.4"
+    id("org.springframework.boot") version "3.2.5"
     id("org.springdoc.openapi-gradle-plugin") version "1.8.0"
     kotlin("plugin.spring") version "2.0.0-RC1"
     id("io.spring.dependency-management") version "1.1.4"

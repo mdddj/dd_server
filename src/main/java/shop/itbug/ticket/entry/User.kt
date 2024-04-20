@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.media.SchemaProperty
 import jakarta.persistence.*
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.security.crypto.factory.PasswordEncoderFactories
+import shop.itbug.ticket.ex.log
 import shop.itbug.ticket.exception.BizException
 import shop.itbug.ticket.exception.CommonEnum
 import java.math.BigDecimal
@@ -24,6 +26,14 @@ fun User?.ifNullThrowBizException() {
 }
 
 
+//验证输入的密码是否正确
+fun User.validPassword(oldPassword: String): Boolean {
+    return PasswordEncoderFactories.createDelegatingPasswordEncoder().matches(oldPassword, password)
+}
+
+fun encodePassword(newPassword: String): String {
+    return PasswordEncoderFactories.createDelegatingPasswordEncoder().encode(newPassword)
+}
 
 
 enum class UserAccountType(val type: Int) {
