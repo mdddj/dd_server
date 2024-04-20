@@ -99,15 +99,18 @@ export const request: RequestConfig = {
   ],
   responseInterceptors: [
     (response: AxiosResponse) => {
-      if (response.status === 200) {
+      if (response.status === 200 && response.data) {
         let data = response.data as Result<any>;
-        if (data.type === ToastType.FinnalToast) {
-          message.success(data.message).then();
-        } else if (data.type === ToastType.FinnalDialog) {
-          Modal.success({
-            content: data.message,
-          });
+        if(data.success){
+          if (data.type === ToastType.FinnalToast) {
+            message.success(data.message).then();
+          } else if (data.type === ToastType.FinnalDialog) {
+            Modal.success({
+              content: data.message,
+            });
+          }
         }
+
       }
       return response;
     },
@@ -129,10 +132,13 @@ export const request: RequestConfig = {
               message.error(errorInfo.message).then();
               break;
             case ToastType.Dialog:
-              Modal.error({ content: errorInfo.message, title: '操作失败' });
+              Modal.error({ content: errorInfo.message, title: '错误' });
               break;
             case ToastType.None:
             case ToastType.Notice:
+            case ToastType.FinnalDialog:
+              Modal.error({ content: errorInfo.message, title: '错误' });
+              break;
           }
         }
       } else {

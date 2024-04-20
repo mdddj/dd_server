@@ -230,6 +230,11 @@ export default defineConfig({
         },
       ],
     },
+    {
+      name: "个人设置",
+      path: "/setting",
+      component: './Setting',
+    }
   ],
 
   npmClient: 'pnpm',

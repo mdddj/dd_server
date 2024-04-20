@@ -16,6 +16,9 @@ import shop.itbug.ticket.controller.UserController
 import shop.itbug.ticket.dao.UserDao
 import shop.itbug.ticket.entry.User
 import shop.itbug.ticket.entry.UserAccountType
+import shop.itbug.ticket.entry.encodePassword
+import shop.itbug.ticket.entry.validPassword
+import shop.itbug.ticket.ex.log
 import shop.itbug.ticket.ex.passwordEncode
 import shop.itbug.ticket.ex.sendValidCode
 import shop.itbug.ticket.exception.BizException
@@ -34,22 +37,23 @@ class UserServiceImpl : UserService {
     @Resource
     private lateinit var userDao: UserDao
 
-    @Resource private lateinit var mailAccountConfig: MailAccountConfig
+    @Resource
+    private lateinit var mailAccountConfig: MailAccountConfig
 
     override fun findByLoginNumber(loginNumber: String?): User? {
         return userDao.findByLoginNumber(loginNumber)
     }
 
     override fun findByPhone(phone: String?): User? {
-        return userDao.findByPhone(phone?:"")
+        return userDao.findByPhone(phone ?: "")
     }
 
     override fun findUsersByType(type: Int): List<User> {
         return userDao.findAllByType(type)
     }
 
-    override fun createAdminAccount(loginNumber: String, password: String,email: String) : User {
-        if(findUsersByType(UserAccountType.Admin.type).isNotEmpty()) {
+    override fun createAdminAccount(loginNumber: String, password: String, email: String): User {
+        if (findUsersByType(UserAccountType.Admin.type).isNotEmpty()) {
             throw BizException("超级管理员账号已经注册")
         }
         val salt = UUID.randomUUID(true).toString(true)
@@ -75,25 +79,23 @@ class UserServiceImpl : UserService {
 
     override fun login(param: LoginParam): LoginSuccessResultModel {
 
-        val user:User?
+        val user: User?
 
-        when(param.loginType){
+        when (param.loginType) {
             "email" -> {
                 user = emailLogin(param)
             }
+
             else -> {
                 try {
                     user = findByLoginNumber(param.loginNumber) ?: throw BizException("账号错误")
-                    val match = PasswordEncoderFactories.createDelegatingPasswordEncoder().matches(param.password, user.password)
+                    val match = user.validPassword(param.password)
                     if (match.not()) throw BizException("登录失败,密码错误")
                 } catch (e: Exception) {
                     throw e
                 }
             }
         }
-
-//        SecurityContextHolder.getContext().authentication =
-//            UsernamePasswordAuthenticationToken(user, null, user.authorities)
         return LoginSuccessResultModel(
             user.generateApiToken(),
             user
@@ -114,7 +116,7 @@ class UserServiceImpl : UserService {
             val salt = UUID.randomUUID(true).toString(true)
             val user = User()
             user.loginNumber = loginName
-            user.userPassword = PasswordEncoderFactories.createDelegatingPasswordEncoder().encode(password)
+            user.userPassword = encodePassword(password ?: "123456")
             user.nickName = "用户@$loginName"
             user.salt = salt
             pic?.let {
@@ -231,7 +233,7 @@ class UserServiceImpl : UserService {
      * 使用邮箱的方式进行登录
      */
     override fun emailLogin(param: LoginParam): User {
-        userDao.findByEmail(param.loginNumber)?:throw BizException("无此账号")
+        userDao.findByEmail(param.loginNumber) ?: throw BizException("无此账号")
         val user = userDao.findByEmailAndStatus(param.loginNumber, 0) ?: throw BizException("该邮箱未注册")
         if (PasswordEncoderFactories.createDelegatingPasswordEncoder().matches(param.password, user.password)) {
             return user
@@ -242,15 +244,11 @@ class UserServiceImpl : UserService {
     override fun removeUser(model: AdminAuthController.DeleteUserParam) {
         try {
             userDao.deleteById(model.id)
-        }catch (e: Exception){
+        } catch (e: Exception) {
             throw BizException("删除失败")
         }
     }
 
-    private fun generateDefaultPassword(): String {
-        return RandomUtil.randomString(8)
-
-    }
 
     override fun findAll(): List<User> {
         return userDao.findAll()
@@ -258,6 +256,18 @@ class UserServiceImpl : UserService {
 
     override fun findByRelationId(relationId: String): User? {
         return userDao.findByRelationId(relationId)
+    }
+
+    override fun updatePassword(user: User, oldPassword: String, newPassword: String) {
+        log().info("update password :${oldPassword} $newPassword")
+        val valid = user.validPassword(oldPassword)
+        if (valid) {
+            user.userPassword = encodePassword(newPassword)
+            userDao.save(user)
+        } else {
+            throw BizException("密码验证失败")
+        }
+
     }
 }
 

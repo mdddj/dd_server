@@ -106,17 +106,13 @@ open class AdminAuthController {
     @PostMapping("/user-update-pass")
     @Operation(summary = "修改用户密码")
     fun updatePassword(
+        @GetLoginUser @Parameter(hidden = true) user: User,
         @RequestBody @Validated passwordParam: UpdatePasswordParam,
         @Parameter(hidden = true) bindingResult: BindingResult
     ): Result<*> {
-
-        // 验证参数
-        if (bindingResult.hasErrors()) {
-            return Result.paramValidError(bindingResult)
-        }
-
-        //todo 修改密码接口
-        return Result.err("修改密码失败")
+        bindingResult.verify()
+        userService.updatePassword(user,passwordParam.currentPass,passwordParam.rePassword)
+        return R.successResult("修改成功")
     }
 
     /**
