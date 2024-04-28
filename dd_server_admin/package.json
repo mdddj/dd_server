@@ -17,7 +17,7 @@
     "@nextui-org/react": "^2.3.5",
     "@umijs/max": "^4.1.10",
     "@wcj/markdown-to-html": "^3.0.2",
-    "antd": "^5.16.2",
+    "antd": "^5.16.4",
     "dayjs": "^1.11.10",
     "framer-motion": "^11.1.7",
     "markdown-it": "^14.1.0",

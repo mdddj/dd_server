@@ -222,7 +222,6 @@ class UserController {
                     user.picture = it
                 }
             }
-
             userService.save(user)
             return fileInfo.successResult()
         } catch (e: Exception) {
