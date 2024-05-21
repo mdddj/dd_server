@@ -6,20 +6,18 @@ import org.springframework.data.jpa.repository.JpaRepository
 import shop.itbug.ticket.admin.model.PageModel
 import shop.itbug.ticket.admin.model.getPageable
 import shop.itbug.ticket.utils.toJson
-import java.util.Optional
 
 abstract class BaseService<T> {
 
     abstract fun getDao(): JpaRepository<T, Long>
 
-    fun saveEntity(entity: T): T {
+    fun saveEntity(entity: T & Any): T {
         return getDao().save(entity)
     }
-
     /**
      * 查找某个对象
      */
-    fun findEntity(entity: T): T? {
+    fun findEntity(entity: T & Any): T? {
         val findBy = getDao().findBy(Example.of(entity)) { f -> f.first() }
         return if (findBy.isPresent) findBy.get() else null
     }
@@ -27,7 +25,7 @@ abstract class BaseService<T> {
     /**
      * 判断对象是否存在
      */
-    fun isExits(entity: T) : Boolean {
+    fun isExits(entity: T & Any) : Boolean {
         return getDao().exists(Example.of(entity))
     }
 

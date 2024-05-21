@@ -220,12 +220,16 @@ class UserServiceImpl : UserService {
             userPassword = passwordEncode(params.password)
         }
         //把默认密码通过邮件发送给用户
-        sendSimpleEmail(
-            user.email,
-            "典典账号注册成功",
-            "请牢记你的密码:${params.password}",
-            true
-        )
+        try {
+            sendSimpleEmail(
+                user.email,
+                "典典账号注册成功",
+                "请牢记你的密码:${params.password}",
+                true
+            )
+        }catch (e:Exception){
+            //忽略发送邮件失败事件
+        }
         return save(user)
     }
 

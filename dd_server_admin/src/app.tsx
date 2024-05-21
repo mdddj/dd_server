@@ -1,15 +1,9 @@
 import { HOST_NAME } from '@/constants';
 import { getJwtToken, removeJwtToken } from '@/utils/cache';
 import { history } from '@@/core/history';
-import {
-  AxiosError,
-  AxiosResponse,
-  RequestConfig,
-  RequestError,
-  RequestOptions,
-} from '@@/plugin-request/request';
+import { AxiosResponse, RequestConfig, RequestError, RequestOptions, } from '@@/plugin-request/request';
 import { StyleProvider } from '@ant-design/cssinjs';
-import { Modal, message } from 'antd';
+import { message, Modal } from 'antd';
 import dayjs from 'dayjs';
 import 'dayjs/locale/zh-cn';
 
@@ -19,7 +13,8 @@ import { User } from '@/types/user';
 import { NextUIProvider } from '@nextui-org/react';
 import updateLocale from 'dayjs/plugin/updateLocale';
 import React from 'react';
-import { Result, ToastType } from './types/result';
+import { ToastType } from './types/result';
+import type { AxiosError } from "axios";
 
 dayjs.extend(updateLocale);
 dayjs.updateLocale('zh-cn', {
@@ -79,7 +74,9 @@ export function onRouteChange({ location }: any) {
     history.push('/login'); // 重定向到登录页面
   }
 }
-
+function isAxiosError(error: RequestError): error is AxiosError {
+  return (error as AxiosError).isAxiosError !== undefined;
+}
 export const request: RequestConfig = {
   baseURL: HOST_NAME,
   requestInterceptors: [
@@ -99,18 +96,36 @@ export const request: RequestConfig = {
   ],
   responseInterceptors: [
     (response: AxiosResponse) => {
-      if (response.status === 200 && response.data) {
-        let data = response.data as Result<any>;
-        if(data.success){
-          if (data.type === ToastType.FinnalToast) {
-            message.success(data.message).then();
-          } else if (data.type === ToastType.FinnalDialog) {
-            Modal.success({
-              content: data.message,
-            });
+      if (response.data) {
+        let { type, success, message: msg } = response.data as ResponseStructure;
+        if (msg.trim() !== "") {
+          if (type === ToastType.FinnalToast) {
+            if (success) {
+              message.success(msg).then();
+            } else {
+              message.error(msg).then();
+            }
+
+          } else if (type === ToastType.FinnalDialog) {
+            if (success) {
+              Modal.success({
+                content: msg,
+              });
+            } else {
+              Modal.error({
+                content: msg,
+              });
+            }
+
+          } else if (type == ToastType.Toast) {
+            if (success) {
+              message.success(msg).then()
+            } else {
+              message.error(msg).then()
+            }
+
           }
         }
-
       }
       return response;
     },
@@ -118,32 +133,14 @@ export const request: RequestConfig = {
   errorConfig: {
     errorHandler(error: RequestError, opts: RequestOptions) {
       if (opts?.skipErrorHandler) throw error;
-      if (error instanceof ApiError) {
-        let result = error.info;
-        if (result.state === 401) {
+      if (isAxiosError(error)) {
+        const { response } = error
+        const status = response?.status
+        if (status === 401 || status === 403) {
           removeJwtToken();
           location.href = '/login';
           return;
         }
-        const errorInfo: ResponseStructure = error.info;
-        if (errorInfo) {
-          switch (errorInfo.type) {
-            case ToastType.Toast:
-              message.error(errorInfo.message).then();
-              break;
-            case ToastType.Dialog:
-              Modal.error({ content: errorInfo.message, title: '错误' });
-              break;
-            case ToastType.None:
-            case ToastType.Notice:
-            case ToastType.FinnalDialog:
-              Modal.error({ content: errorInfo.message, title: '错误' });
-              break;
-          }
-        }
-      } else {
-        const axiosError = error as AxiosError;
-        message.error(axiosError.message).then();
       }
     },
     errorThrower(res: ResponseStructure) {
@@ -153,6 +150,8 @@ export const request: RequestConfig = {
     },
   },
 };
+
+
 
 export function rootContainer(
   container:

@@ -18,14 +18,12 @@ import org.springframework.web.multipart.MultipartFile
 import shop.itbug.ticket.admin.model.PageModel
 import shop.itbug.ticket.annotation.GetLoginUser
 import shop.itbug.ticket.entry.FileInfo
+import shop.itbug.ticket.entry.FileInfoSaveConfig
 import shop.itbug.ticket.entry.User
 import shop.itbug.ticket.entry.storage.StorageServiceImpl
 import shop.itbug.ticket.exception.BizException
 import shop.itbug.ticket.exception.ResultDialogType
-import shop.itbug.ticket.service.MianjiService
-import shop.itbug.ticket.service.MyResourceService
-import shop.itbug.ticket.service.UserService
-import shop.itbug.ticket.service.ZheTkService
+import shop.itbug.ticket.service.*
 import shop.itbug.ticket.shiro.JwtUtil
 import shop.itbug.ticket.utils.*
 
@@ -53,7 +51,7 @@ class UserController {
 
 
     @Resource
-    lateinit var storageServiceImpl: StorageServiceImpl
+    lateinit var fileInfoService: FileInfoService
 
     /**
      * 根据token获取用户信息失败
@@ -69,23 +67,20 @@ class UserController {
             defaultValue = ""
         ) @Parameter(name = "用户token", required = true) token: String,
         @Parameter(hidden = true) request: HttpServletRequest
-    ): Result<*> {
+    ): Result<User> {
         var userToken = token
         if (StringUtils.isBlank(userToken)) {
             userToken = request.getHeader("authorization")
         }
-
-
         val id = JwtUtil.getUsername(userToken)
         if (id != null) {
             val user = userService.findByUserId(id) ?: throw BizException("获取用户信息失败")
-
             val verify = JwtUtil.verify(userToken, user.id!!, user.password)
             return if (!verify) {
-                Result.err("登录信息已过时,请重新登录")
+                throw BizException("登录信息已过时,请重新登录")
             } else Result.ok(user)
         }
-        return Result<Any>("查询用户信息失败")
+        throw BizException("查询用户信息失败")
     }
 
     /**
@@ -134,7 +129,7 @@ class UserController {
         bindingResult: BindingResult
     ): Result<*> {
         bindingResult.verify()
-        return myResourceService.findListByUser(user, pageModel).SuccessResult()
+        return myResourceService.findListByUser(user, pageModel).successResult()
     }
 
     /**
@@ -147,7 +142,7 @@ class UserController {
         bindingResult: BindingResult
     ): Result<*> {
         bindingResult.verify()
-        return mianjiService.findMianListWithUser(user, pageModel).SuccessResult()
+        return mianjiService.findMianListWithUser(user, pageModel).successResult()
     }
 
 
@@ -172,7 +167,7 @@ class UserController {
         bindingResult: BindingResult
     ): ResultJSON<*> {
         bindingResult.verify()
-        return userService.regAccountWithEmail(params).SuccessResult("发送验证码成功")
+        return userService.regAccountWithEmail(params).successResult("发送验证码成功")
     }
 
     /**
@@ -185,7 +180,7 @@ class UserController {
         bindingResult: BindingResult
     ): ResultJSON<*> {
         bindingResult.verify()
-        return userService.validEmailCode(params).SuccessResult("账号注册成功")
+        return userService.validEmailCode(params).successResult("账号注册成功")
     }
 
 
@@ -214,7 +209,8 @@ class UserController {
         httpServletRequest: HttpServletRequest
     ): ResultJSON<FileInfo> {
         try {
-            val fileInfo = storageServiceImpl.getLinkUrl(file, "avatar", httpServletRequest.getCurrentHost(), user)
+            val config = FileInfoSaveConfig(user,httpServletRequest.getCurrentHost(),"用户头像")
+            val fileInfo = fileInfoService.getLinkUrl(file, config)
                 ?: throw BizException("更换头像失败，请稍后重试")
 
             fileInfo.url?.let {
@@ -222,7 +218,6 @@ class UserController {
                     user.picture = it
                 }
             }
-
             userService.save(user)
             return fileInfo.successResult()
         } catch (e: Exception) {

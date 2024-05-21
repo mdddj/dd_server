@@ -7,12 +7,12 @@ val sbVersion = "3.2.5"
 plugins {
     `maven-publish`
     idea
-    id("org.jetbrains.kotlin.jvm") version "2.0.0-RC1"
+    id("org.jetbrains.kotlin.jvm") version "2.0.0-RC3"
     id("org.springframework.boot") version "3.2.5"
     id("org.springdoc.openapi-gradle-plugin") version "1.8.0"
-    kotlin("plugin.spring") version "2.0.0-RC1"
+    kotlin("plugin.spring") version "2.0.0-RC3"
     id("io.spring.dependency-management") version "1.1.4"
-    kotlin("plugin.serialization") version "2.0.0-RC1"
+    kotlin("plugin.serialization") version "2.0.0-RC3"
     id("com.google.osdetector") version "1.7.1"
 }
 
@@ -64,7 +64,7 @@ dependencies {
 }
 
 group = "shop.itbug"
-version = "0.0.2"
+version = "0.0.4"
 description = "梁典典的后台服务"
 
 
@@ -88,4 +88,16 @@ tasks.named<Test>("test") {
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
+}
+
+kotlin {
+    sourceSets.all {
+        languageSettings {
+            languageVersion = "2.0"
+        }
+    }
+}
+
+tasks.bootJar {
+    archiveFileName.set("dd_service.jar")
 }

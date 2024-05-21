@@ -8,6 +8,9 @@
 * Mysql8
 * Redis
 
+
+> 提示后台前端代码在`dd_server_admin`目录
+
 ## 2.安装
 
 ##### * 自己编译项目
@@ -82,3 +85,23 @@ docker run --name dd_erver --network=host \
 方案1: 参考`nginx.conf`配置添加证书后自己构建镜像
 
 方案2: 自己服务器部署一个nginx,使用反向代理
+
+
+
+## 其他
+
+# 上传文件服务
+```kotlin
+abstract class StorageAbstract {
+    abstract fun getLinkUrl(file: MultipartFile,subFolderName: String = "",host:String = "",user: User?) : FileInfo?
+}
+///调用示例
+// 参数1 文件对象 - MultipartFile
+// 参数2 avatar - 二级目录名称,多个目录可以 avatar/user 像这样分开
+storageServiceImpl.getLinkUrl(file, "avatar", httpServletRequest.getCurrentHost(), user);
+```
+
+
+## 开发插件
+如果你用的是 IntelliJ IDEA Ultimate
+可以使用dd_kotlin_util工具快速生成一些模板代码

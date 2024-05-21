@@ -26,9 +26,6 @@ class InitAppRunner : ApplicationRunner {
     private lateinit var userService: UserService
 
     @Resource
-    private lateinit var dtkDetailService: DTKDetailService
-
-    @Resource
     private lateinit var categoryService: CategoryService
 
     @Resource
@@ -36,9 +33,6 @@ class InitAppRunner : ApplicationRunner {
 
     @Resource
     private lateinit var tagService: TagService
-
-    @Resource
-    private lateinit var permissionValidationTokenService: PermissionValidationTokenService
 
     @Resource
     private lateinit var resourceLoader: ResourceLoader
@@ -49,9 +43,9 @@ class InitAppRunner : ApplicationRunner {
     @Resource
     private lateinit var resourcesCategoryService: ResourcesCategoryService
 
-
     @Resource
     private lateinit var systemAvatarService: SystemAvatarService
+
     @Throws(IOException::class)
     override fun run(args: ApplicationArguments) {
         roleInit()
@@ -125,12 +119,11 @@ class InitAppRunner : ApplicationRunner {
      * 将管理员的账号设置为管理员权限
      */
     private fun roleInit() {
-        if(roleService.findRoleByName("admin")==null){
+        if (roleService.findRoleByName("admin") == null) {
             roleService.save(Role.createRole("admin", "超级管理员"))
         }
 
     }
-
 
 
     /**
@@ -140,7 +133,7 @@ class InitAppRunner : ApplicationRunner {
         val adminAccounts = userService.findUsersByType(100)
         if (adminAccounts.isEmpty()) {
             val user = userService.createAdminAccount("admin", "123456", "")
-            roleService.addRole(user){ it.name == "admin" }
+            roleService.addRole(user) { it.name == "admin" }
             log().info("管理员账号创建成功,用户名:admin,密码:123456")
         }
 
@@ -152,11 +145,11 @@ class InitAppRunner : ApplicationRunner {
      */
     private fun checkAdminAccount() {
         val findUsersByType = userService.findUsersByType(100)
-        if(findUsersByType.isNotEmpty()){
+        if (findUsersByType.isNotEmpty()) {
             findUsersByType.forEach {
-                if(it.hasAdminRole().not()){
+                if (it.hasAdminRole().not()) {
                     log().warn("${it.getShowName()} 此账号没有配置管理员账号,即将自动添加admin权限")
-                    roleService.userAddRole(it.id!!,"admin")
+                    roleService.userAddRole(it.id!!, "admin")
                 }
             }
         }
@@ -187,12 +180,14 @@ class InitAppRunner : ApplicationRunner {
                     getBlog("blog1"),
                     it,
                     "test1",
-                    getTags("compose", "android"),""
+                    getTags("compose", "android"), ""
                 )
             }
             java.id?.let {
-                blogService.create("compose 桌面开发入门之图片资源使用", getBlog("blog2"),
-                    it, "", getTags("compose", "android"),"")
+                blogService.create(
+                    "compose 桌面开发入门之图片资源使用", getBlog("blog2"),
+                    it, "", getTags("compose", "android"), ""
+                )
             }
             flutter.id?.let {
                 blogService.create(
@@ -205,8 +200,10 @@ class InitAppRunner : ApplicationRunner {
                 )
             }
             kotlin.id?.let {
-                blogService.create("Android Kotlin 加载一张网络图片", getBlog("blog4"),
-                    it, "", getTags("kotlin", "图片"),"")
+                blogService.create(
+                    "Android Kotlin 加载一张网络图片", getBlog("blog4"),
+                    it, "", getTags("kotlin", "图片"), ""
+                )
             }
             kotlin.id?.let {
                 blogService.create(
@@ -214,7 +211,7 @@ class InitAppRunner : ApplicationRunner {
                     getBlog("blog5"),
                     it,
                     "",
-                    getTags("kotlin", "语法"),""
+                    getTags("kotlin", "语法"), ""
                 )
             }
         }
@@ -237,9 +234,6 @@ class InitAppRunner : ApplicationRunner {
         }
         return tagService.save(hashSet)
     }
-
-
-
 
 
 }

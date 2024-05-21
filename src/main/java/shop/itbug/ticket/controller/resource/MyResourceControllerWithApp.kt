@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile
 import shop.itbug.ticket.admin.model.PageModel
 import shop.itbug.ticket.annotation.GetLoginUser
 import shop.itbug.ticket.annotation.ServiceHost
+import shop.itbug.ticket.entry.FileInfoSaveConfig
 import shop.itbug.ticket.entry.MyResources
 import shop.itbug.ticket.entry.ResourcesCategory
 import shop.itbug.ticket.entry.User
@@ -21,12 +22,12 @@ import shop.itbug.ticket.entry.storage.StorageServiceImpl
 import shop.itbug.ticket.exception.BizException
 import shop.itbug.ticket.exception.CommonEnum
 import shop.itbug.ticket.model.params.IdBody
+import shop.itbug.ticket.service.FileInfoService
 import shop.itbug.ticket.service.MianjiService
 import shop.itbug.ticket.service.MyResourceService
 import shop.itbug.ticket.service.ResourcesCategoryService
 import shop.itbug.ticket.utils.Result
 import shop.itbug.ticket.utils.ResultJSON
-import shop.itbug.ticket.utils.SuccessResult
 import shop.itbug.ticket.utils.successResult
 
 @RestController
@@ -43,7 +44,7 @@ class MyResourceControllerWithApp {
 
 
     @Resource
-    private lateinit var storageServiceImpl: StorageServiceImpl
+    private lateinit var fileInfoService: FileInfoService
 
     @Resource
     private lateinit var mianjiService: MianjiService
@@ -57,7 +58,7 @@ class MyResourceControllerWithApp {
     ): ResultJSON<*> {
         val findByName = resourcesCategoryService.findByName(name, type)
         val findListByResourceCategory = myResourceService.findListByResourceCategory(findByName, pageModel)
-        return findListByResourceCategory.SuccessResult("获取成功")
+        return findListByResourceCategory.successResult("获取成功")
     }
 
 
@@ -106,8 +107,9 @@ class MyResourceControllerWithApp {
             }
 
             if (!params.files.isNullOrEmpty()) {
+                val config = FileInfoSaveConfig(user,host,params.cateName)
                 val files =
-                    storageServiceImpl.saveAllFiles(params.files, params.cateName, host, user)
+                    fileInfoService.saveAllFiles(params.files, config)
                 resource.images = files.toMutableSet()
             }
             if (params.mianjiId != null) {
@@ -137,7 +139,7 @@ class MyResourceControllerWithApp {
     fun findByUser(@GetLoginUser user: User, pageModel: PageModel): ResultJSON<Page<MyResources>> {
         try {
             val data = myResourceService.findListByUser(user, pageModel)
-            return data.SuccessResult()
+            return data.successResult()
         }catch (e:Exception){
             e.printStackTrace()
             throw BizException("获取数据失败")

@@ -31,7 +31,7 @@ class JobsController {
     @GetMapping("/city")
     @Operation(summary = "城市列表")
     fun getJobsCity(): ResultJSON<*> {
-        return resourcesCategoryService.findAllByObj(ResourcesCategory().apply { type = "jobs-city" }).SuccessResult()
+        return resourcesCategoryService.findAllByObj(ResourcesCategory().apply { type = "jobs-city" }).successResult()
     }
 
 
@@ -60,7 +60,7 @@ class JobsController {
             category = cate
             type = cate?.type
         })
-        return findList.SuccessResult()
+        return findList.successResult()
     }
 
 }

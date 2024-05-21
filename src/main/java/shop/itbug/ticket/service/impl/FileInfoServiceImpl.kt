@@ -1,24 +1,38 @@
 package shop.itbug.ticket.service.impl
 
+import cn.hutool.core.date.DateUtil
+import cn.hutool.core.io.FileUtil
+import cn.hutool.core.io.file.FileNameUtil
 import jakarta.annotation.Resource
+import jakarta.servlet.http.HttpServletRequest
 import org.springframework.data.domain.Example
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import shop.itbug.ticket.admin.model.PageModel
 import shop.itbug.ticket.admin.model.getCurrentPage
 import shop.itbug.ticket.admin.model.getPageable
+import shop.itbug.ticket.controller.getCurrentHost
 import shop.itbug.ticket.dao.FileInfoRepository
 import shop.itbug.ticket.entry.FileInfo
+import shop.itbug.ticket.entry.FileInfoSaveConfig
 import shop.itbug.ticket.entry.ResourcesCategory
 import shop.itbug.ticket.entry.User
+import shop.itbug.ticket.entry.storage.StorageServiceImpl
 import shop.itbug.ticket.exception.BizException
 import shop.itbug.ticket.exception.CommonEnum
 import shop.itbug.ticket.exception.ResultDialogType
 import shop.itbug.ticket.service.FileInfoService
+import shop.itbug.ticket.service.MinioService
+import shop.itbug.ticket.utils.FileManagerWrapper
+import shop.itbug.ticket.utils.ImageCheck
+import java.awt.Dimension
 import java.io.File
+import java.io.IOException
+import javax.imageio.ImageIO
 
 /**
  * @author eee
@@ -28,6 +42,9 @@ class FileInfoServiceImpl : FileInfoService {
     @Resource
     private lateinit var fileInfoRepository: FileInfoRepository
 
+
+    @Resource
+    private lateinit var minioService: MinioService
 
     /**
      * 保存或者修改一个文件类型
@@ -103,33 +120,6 @@ class FileInfoServiceImpl : FileInfoService {
         }
     }
 
-    /**
-     * 将前台存储的图片上传到阿里云oss,并记录数据到数据库
-     *
-     * @param pictures          前端上传的文件列表
-     * @param imageType         文件夹类型
-     * @param resourcesCategory 文件所属帖子分类,可以为null
-     * @return 保存到数据库后的列表
-     */
-    override fun savePicsToSqlData(
-        pictures: Array<MultipartFile>?,
-        imageType: String,
-        resourcesCategory: ResourcesCategory?
-    ): List<FileInfo> {
-        val aliUrls = ArrayList<FileInfo>()
-        if (pictures != null) {
-            for (file in pictures) {
-                val saved = saveFile(file, imageType, resourcesCategory)
-                aliUrls.add(saved)
-            }
-        }
-        /// 遍历文件存储到数据库。
-        return saveAll(aliUrls)
-    }
-
-    override fun saveFile(file: MultipartFile, type: String, resourcesCategory: ResourcesCategory?): FileInfo {
-        throw BizException("未完成逻辑")
-    }
 
     /**
      * 尝试删除一个文件对象
@@ -166,5 +156,78 @@ class FileInfoServiceImpl : FileInfoService {
     override fun findByUser(user: User, pageModel: PageModel): Page<FileInfo> {
         val req = pageModel.getPageable("createDate")
         return fileInfoRepository.findAllByUser(user, req)
+    }
+
+    override fun getLinkUrl(file: MultipartFile, config: FileInfoSaveConfig): FileInfo? {
+        val (user,host,folderName,saveEntity) = config
+        if (folderName.isNotBlank() && folderName.startsWith("/")) {
+            throw BizException("目录前不能带 / 符号")
+        }
+        val manager = FileManagerWrapper(file)
+        val nameModel = manager.getFinalName()
+        val finalName = nameModel.name
+        val fileInfo = FileInfo().apply {
+            this.fileName = finalName
+            this.fileSize = file.size
+            this.fileType = FileUtil.extName(finalName)
+            this.createDate = DateUtil.date()
+            this.ext = FileNameUtil.extName(file.originalFilename)
+            this.isImage = file.originalFilename?.let { ImageCheck.isImage(it) }
+            originalFilename = file.originalFilename
+        }
+
+        if (ImageCheck.isImage(finalName)) {
+            getImageDimensions(file)?.let { size ->
+                {
+                    fileInfo.width = size.width
+                    fileInfo.height = size.height
+                }
+            }
+
+        }
+
+        val model = minioService.uploadFile(file, finalName, folderName)
+
+        fileInfo.url = model.url
+        fileInfo.fullUrl = model.fullUrl
+        fileInfo.minioObjectName = model.objectName
+        fileInfo.minioBucketName = model.bucketName
+        fileInfo.user = user
+        if(!saveEntity){
+            return fileInfo
+        }
+        return fileInfoRepository.save(fileInfo)
+    }
+
+
+    /**
+     * 存储全部图片
+     */
+    @Transactional
+    override fun saveAllFiles(
+        files: List<MultipartFile>,
+        config: FileInfoSaveConfig
+    ): MutableSet<FileInfo> {
+        val fileInfos = mutableSetOf<FileInfo>()
+        files.forEach {
+            fileInfos.add(getLinkUrl(it, config) ?: throw BizException("上传图片失败"))
+        }
+        return fileInfos
+    }
+
+    fun getImageDimensions(file: MultipartFile): Dimension? {
+        try {
+            file.inputStream.use { inputStream ->
+                val image = ImageIO.read(inputStream)
+                if (image != null) {
+                    val width = image.width
+                    val height = image.height
+                    return Dimension(width, height)
+                }
+            }
+            return null
+        } catch (e: IOException) {
+            return null
+        }
     }
 }

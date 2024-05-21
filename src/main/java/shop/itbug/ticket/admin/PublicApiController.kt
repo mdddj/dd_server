@@ -177,7 +177,7 @@ class PublicApiController {
     @GetMapping("/findByType-pub")
     @Operation(summary = "获取群组(公开),需要传入类型")
     fun findListByType(type: String) : ResultJSON<List<ResourcesCategoryCounter>> {
-        return resourcesCategoryService.selectCategoryResourceWithType(type).SuccessResult()
+        return resourcesCategoryService.selectCategoryResourceWithType(type).successResult()
     }
 
 

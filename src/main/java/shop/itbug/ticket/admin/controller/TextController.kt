@@ -12,7 +12,6 @@ import shop.itbug.ticket.entry.blog.Text
 import shop.itbug.ticket.service.blog.TextService
 import shop.itbug.ticket.utils.R
 import shop.itbug.ticket.utils.Result
-import shop.itbug.ticket.utils.SuccessResult
 import shop.itbug.ticket.utils.successResult
 
 /**
@@ -57,6 +56,6 @@ class TextController {
     @Operation(summary = "删除某个字典")
     fun delete(id: Long): R<Boolean> {
         textService.deleteById(id)
-        return true.SuccessResult("删除成功")
+        return true.successResult("删除成功")
     }
 }

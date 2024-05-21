@@ -14,10 +14,12 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import shop.itbug.ticket.admin.model.PageModel
 import shop.itbug.ticket.annotation.GetLoginUser
+import shop.itbug.ticket.entry.FileInfoSaveConfig
 import shop.itbug.ticket.entry.Mianji
 import shop.itbug.ticket.entry.User
 import shop.itbug.ticket.entry.storage.StorageServiceImpl
 import shop.itbug.ticket.exception.BizException
+import shop.itbug.ticket.service.FileInfoService
 import shop.itbug.ticket.service.MianjiService
 import shop.itbug.ticket.utils.Result
 import shop.itbug.ticket.utils.ResultJSON
@@ -34,7 +36,7 @@ class MianjiController {
     @Resource
     private lateinit var  mainjiService: MianjiService
 
-    @Resource private lateinit var storageServiceImpl: StorageServiceImpl
+    @Resource private lateinit var fileInfoService: FileInfoService
     /**
      * 获取面基列表
      * @param pageModel 分页
@@ -59,8 +61,8 @@ class MianjiController {
         model.user = user
 
         if(files.isNotEmpty()){
-            model.images = storageServiceImpl.saveAllFiles(files,"",
-                httpServletRequest.getCurrentHost(),user)
+            val config = FileInfoSaveConfig(user,httpServletRequest.getCurrentHost(),"面基图片")
+            model.images = fileInfoService.saveAllFiles(files,config)
         }
 
         println(model.images.toJSONString())

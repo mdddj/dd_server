@@ -62,17 +62,14 @@ export async function MyResourceListApi(
  * @param params
  * @constructor
  */
-export async function MyResourceAddPostApi(params: any): Promise<
-  Result<{
-    images: FileInfo[];
-    post: MyResources;
-  }>
-> {
-  let data = objectToFormData(params);
+export async function MyResourceAddPostApi(params: FormData): Promise<Result<{
+  images: FileInfo[];
+  post: MyResources;
+}>> {
   return request('/api/resource/add-post', {
     method: 'POST',
     headers: formDataHeader(),
-    data: data,
+    data: params,
   });
 }
 

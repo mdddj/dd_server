@@ -7,6 +7,16 @@ import io.swagger.v3.oas.annotations.media.SchemaProperty
 import jakarta.persistence.*
 import java.util.*
 
+
+
+data class FileInfoSaveConfig(
+    val user: User? = null,
+    val host: String = "",
+    val folderName: String = "",
+    ///是否需要把file info 持久化到数据库?
+    val saveEntity: Boolean = true
+)
+
 /**
  * @author eee
  */
@@ -125,6 +135,10 @@ class FileInfo {
 
     @Schema(description = "扩展")
     var ext: String? = null
+
+    override fun toString(): String {
+        return "file info: $url"
+    }
 }
 
 

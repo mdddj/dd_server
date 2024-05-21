@@ -4,16 +4,21 @@ import com.alibaba.fastjson2.JSONObject
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.annotation.Resource
+import jakarta.servlet.http.HttpServletRequest
 import org.springframework.data.domain.Page
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.BindingResult
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import shop.itbug.ticket.admin.model.PageModel
 import shop.itbug.ticket.annotation.GetLoginUser
+import shop.itbug.ticket.controller.getCurrentHost
 import shop.itbug.ticket.entry.FileInfo
+import shop.itbug.ticket.entry.FileInfoSaveConfig
 import shop.itbug.ticket.entry.ResourcesCategory
 import shop.itbug.ticket.entry.User
+import shop.itbug.ticket.entry.storage.StorageServiceImpl
 import shop.itbug.ticket.exception.BizException
 import shop.itbug.ticket.exception.CommonEnum
 import shop.itbug.ticket.service.FileInfoService
@@ -29,12 +34,15 @@ import shop.itbug.ticket.utils.successResult
 @RestController
 @RequestMapping("/api/file")
 @Tag(name = "文件接口(管理员)")
+@PreAuthorize("hasRole('admin')")
 class FileController {
     @Resource
     private lateinit var resourcesCategoryService: ResourcesCategoryService
 
     @Resource
-    private lateinit var fileInfoService: FileInfoService
+    private lateinit var storageServiceImpl: StorageServiceImpl
+
+    @Resource private lateinit var fileInfoService: FileInfoService
 
     /**
      * 上传一个文件
@@ -43,11 +51,12 @@ class FileController {
      */
     @PostMapping("/upload")
     @Operation(summary = "上传文件(oss)", deprecated = true)
-    fun uploadWithSimple(@RequestParam("file") file: MultipartFile?): Result<*> {
+    fun uploadWithSimple(@RequestParam("file") file: MultipartFile?,request: HttpServletRequest,@GetLoginUser user: User): Result<*> {
         if (file == null) {
             return Result.err("请选择文件")
         }
-        val aPublic = fileInfoService.saveFile(file, "public", null)
+        val config = FileInfoSaveConfig(user,request.getCurrentHost(),"public")
+        val aPublic = fileInfoService.getLinkUrl(file,config)
         return Result.ok(aPublic)
     }
 

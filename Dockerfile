@@ -3,7 +3,7 @@ USER root
 RUN apk add --no-cache nginx
 VOLUME /tmp
 VOLUME /root/.dd
-ADD ./build/libs/dd_service-0.0.2.jar dd_service.jar
+ADD ./build/libs/dd_service.jar dd_service.jar
 ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 COPY nginx.conf /etc/nginx/nginx.conf

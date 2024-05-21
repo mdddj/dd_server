@@ -81,9 +81,6 @@ open class AdminAuthController {
     @Resource
     lateinit var friendLinkService: FriendLinkService
 
-    @Resource
-    lateinit var storageServiceImpl: StorageServiceImpl
-
     /**
      * 添加一个新用户
      *
@@ -111,7 +108,7 @@ open class AdminAuthController {
         @Parameter(hidden = true) bindingResult: BindingResult
     ): Result<*> {
         bindingResult.verify()
-        userService.updatePassword(user,passwordParam.currentPass,passwordParam.rePassword)
+        userService.updatePassword(user, passwordParam.currentPass, passwordParam.rePassword)
         return R.successResult("修改成功")
     }
 
@@ -120,13 +117,13 @@ open class AdminAuthController {
      */
     @DeleteMapping("/blog-delete")
     @Operation(summary = "删除博客")
-    fun deleteBlog(@RequestBody idBody: IdBody ) : Result<Boolean> {
+    fun deleteBlog(@RequestBody idBody: IdBody): Result<Boolean> {
         try {
             val blogId = idBody.id
             blogService.delete(blogId)
-            return R(true,"删除成功")
-        }catch (e:Exception){
-            return R.err("删除博客失败:$e",false)
+            return R(true, "删除成功")
+        } catch (e: Exception) {
+            return R.err("删除博客失败:$e", false)
         }
     }
 
@@ -351,9 +348,12 @@ open class AdminAuthController {
         @RequestParam("id") id: Long,
         httpServletRequest: HttpServletRequest,
         @GetLoginUser user: User
-    ) : Result<ResourcesCategory> {
+    ): Result<ResourcesCategory> {
+        val config = FileInfoSaveConfig(
+            user = user, host = httpServletRequest.getCurrentHost(), folderName = "resourceCategoryThumbnail"
+        )
         val linkUrl =
-            storageServiceImpl.getLinkUrl(file, "resourceCategoryThumbnail", httpServletRequest.getCurrentHost(), user)
+            fileInfoService.getLinkUrl(file, config)
                 ?: throw BizException("上传图片失败")
         val resourceCategory = resourcesCategoryService.findById(id) ?: throw BizException("查找分类失败")
         resourceCategory.logo = linkUrl.thumbnail
@@ -556,8 +556,9 @@ open class AdminAuthController {
     )
     fun simpleUpload(file: MultipartFile, @GetLoginUser user: User, @ServiceHost host: String?): Result<String> {
         return try {
+            val config = FileInfoSaveConfig(user = user, folderName = "simple-file", host = host ?: "")
             val linkUrl =
-                storageServiceImpl.getLinkUrl(file, "simple-file", host ?: "", user) ?: throw BizException("上传失败")
+                fileInfoService.getLinkUrl(file, config) ?: throw BizException("上传失败")
             Result.ok(linkUrl.url)
         } catch (e: Exception) {
             throw BizException("上传失败:${e.localizedMessage}")

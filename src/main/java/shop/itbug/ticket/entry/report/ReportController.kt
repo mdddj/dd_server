@@ -12,8 +12,10 @@ import org.springframework.web.multipart.MultipartFile
 import shop.itbug.ticket.admin.model.PageModel
 import shop.itbug.ticket.annotation.GetLoginUser
 import shop.itbug.ticket.annotation.ServiceHost
+import shop.itbug.ticket.entry.FileInfoSaveConfig
 import shop.itbug.ticket.entry.User
 import shop.itbug.ticket.entry.storage.StorageServiceImpl
+import shop.itbug.ticket.service.FileInfoService
 import shop.itbug.ticket.utils.ResultJSON
 import shop.itbug.ticket.utils.successResult
 
@@ -25,14 +27,15 @@ class ReportController {
     private lateinit var reportService: ReportService
 
     @Resource
-    private lateinit var storageServiceImpl: StorageServiceImpl
+    private lateinit var fileInfoService: FileInfoService
 
     data class AddReportParam(val content: String, val type: String, val images: List<MultipartFile>)
 
     @PostMapping("/save")
     @Operation(summary = "添加一条举报记录")
     fun addReport(@GetLoginUser user: User, params: AddReportParam, @ServiceHost host: String): ResultJSON<Report> {
-        val imageFiles = storageServiceImpl.saveAllFiles(params.images, "", host, user)
+        val config = FileInfoSaveConfig(user,host,"举报图片")
+        val imageFiles = fileInfoService.saveAllFiles(params.images, config)
         val obj = Report().apply {
             this.images = imageFiles
             this.content = params.content

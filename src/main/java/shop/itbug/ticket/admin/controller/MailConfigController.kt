@@ -33,7 +33,7 @@ class MailConfigController {
 
     @GetMapping("/get")
     @Operation(summary = "获取配置")
-    fun get(): R<MyMailAccount> = mailAccountConfig.setting.successResult("获取成功")
+    fun get(): R<MyMailAccount> = mailAccountConfig.setting.successResult("获取成功").changeDialogType(ResultDialogType.None)
 
     @Schema(name = "邮件测试参数")
     data class TestEmail(

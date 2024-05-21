@@ -27,7 +27,7 @@ enum class CommonEnum(
     ),
     NO_AUTHORIZATION_HEADER(401, "无法获取用户信息"),
     NO_AUTHORIZATION_INVALID(401, "token过期,请重新登录"),
-    TOKEN_INVALID(506, "不是有效的token"),
+    TOKEN_INVALID(401, "不是有效的token"),
     EXCEPTION(500,"网络繁忙,请稍后重试"),
     ORDER_NOTFOUND_BY_TASK(308,"没有查询到订单")
     ;
