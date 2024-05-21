@@ -5,28 +5,30 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.annotation.Resource
+import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.Valid
 import org.apache.commons.lang3.StringUtils
 import org.springframework.data.domain.Page
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest
 import shop.itbug.ticket.admin.model.PageModel
 import shop.itbug.ticket.annotation.GetLoginUser
+import shop.itbug.ticket.controller.getCurrentHost
 import shop.itbug.ticket.entry.FileInfo
+import shop.itbug.ticket.entry.FileInfoSaveConfig
 import shop.itbug.ticket.entry.MyResources
 import shop.itbug.ticket.entry.User
+import shop.itbug.ticket.ex.log
 import shop.itbug.ticket.exception.BizException
-import shop.itbug.ticket.exception.CommonEnum
 import shop.itbug.ticket.model.params.AddPostParamsModel
 import shop.itbug.ticket.model.params.IdBody
 import shop.itbug.ticket.service.FileInfoService
 import shop.itbug.ticket.service.MianjiService
 import shop.itbug.ticket.service.MyResourceService
 import shop.itbug.ticket.service.ResourcesCategoryService
-import shop.itbug.ticket.utils.Result
-import shop.itbug.ticket.utils.ResultJSON
-import shop.itbug.ticket.utils.printToConsole
-import shop.itbug.ticket.utils.successResult
+import shop.itbug.ticket.utils.*
 
 /**
  * @author eee
@@ -82,19 +84,20 @@ class MyResourceController {
     @PostMapping("/add-post")
     @Operation(summary = "发布动态")
     fun addPost(
-        @GetLoginUser @Parameter(hidden = true) user: User?,
-        @Valid paramsModel: AddPostParamsModel, @Parameter(hidden = true) bindingResult: BindingResult
+        @GetLoginUser @Parameter(hidden = true) user: User,
+        @Valid @ModelAttribute paramsModel: AddPostParamsModel,
+        @RequestParam(name = "pictures", required = false) pictures: List<MultipartFile> = emptyList(),
+        @Parameter(hidden = true) bindingResult: BindingResult,
+        request: HttpServletRequest,
     ): Result<AddPostResult> {
-        if (user == null) {
-            throw BizException(CommonEnum.SIGNATURE_NOT_MATCH)
-        }
+        bindingResult.verify()
         paramsModel.printToConsole()
         val resourcesCategory = paramsModel.categoryId?.let { resourcesCategoryService.findById(it) }
             ?: throw BizException("获取资源失败")
+        val config = FileInfoSaveConfig(user,request.getCurrentHost(), resourcesCategory.name ?: "postImage",false)
         val files =
-            paramsModel.pictures?.let {
-                fileInfoService.savePicsToSqlData(it, "postImage", resourcesCategory).toHashSet()
-            }
+            fileInfoService.saveAllFiles(pictures, config).toHashSet()
+        log().info("upload success files result:${files}")
         val post = paramsModel.id?.let { myResourceService.findById(it) } ?: MyResources()
         post.content = paramsModel.content
         post.createDate = paramsModel.createDate ?: DateUtil.date()

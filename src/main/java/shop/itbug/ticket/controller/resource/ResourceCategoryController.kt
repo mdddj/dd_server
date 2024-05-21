@@ -14,7 +14,7 @@ import shop.itbug.ticket.exception.CommonEnum
 import shop.itbug.ticket.service.ResourcesCategoryService
 import shop.itbug.ticket.utils.Result
 import shop.itbug.ticket.utils.ResultJSON
-import shop.itbug.ticket.utils.SuccessResult
+import shop.itbug.ticket.utils.successResult
 
 /**
  * ResourceCategory 公共的接口控制器
@@ -34,7 +34,7 @@ class ResourceCategoryController {
      */
     @Operation(summary = "查询群组所有的类型")
     @GetMapping("/types")
-    fun getTypes(): Result<List<ResourceCategoryTypes?>> {
+    fun getTypes(): Result<List<ResourceCategoryTypes>> {
         val allTypes = resourcesCategoryService.findAllTypes()
         return Result(allTypes)
     }
@@ -42,7 +42,7 @@ class ResourceCategoryController {
 
     @GetMapping("/findByType")
     fun findListByType(type: String) : ResultJSON<List<ResourcesCategoryCounter>> {
-        return resourcesCategoryService.selectCategoryResourceWithType(type).SuccessResult()
+        return resourcesCategoryService.selectCategoryResourceWithType(type).successResult()
     }
 
     @GetMapping("/findById")

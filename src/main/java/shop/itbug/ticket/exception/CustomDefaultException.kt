@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.servlet.HandlerExceptionResolver
 import org.springframework.web.servlet.ModelAndView
 import shop.itbug.ticket.ex.log
+import shop.itbug.ticket.utils.successResult
 
 @ControllerAdvice
 class CustomDefaultException : HandlerExceptionResolver {
@@ -17,6 +18,7 @@ class CustomDefaultException : HandlerExceptionResolver {
     ): ModelAndView? {
         log().warn(ex.localizedMessage)
         ex.printStackTrace()
+
         return null
     }
 }

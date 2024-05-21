@@ -64,7 +64,6 @@ class MinioService {
                 throw BizException("未配置 bucketName")
             }
             handle = MinioHandler(minioSetting)
-            log().info("minio config: ${minioConfig.setting.toJSONString()}")
             return doHandle(handle!!, minioSetting)
         } catch (e: BizException) {
             throw e

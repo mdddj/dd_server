@@ -1,10 +1,12 @@
 package shop.itbug.ticket.service
 
+import jakarta.servlet.http.HttpServletRequest
 import org.springframework.data.domain.Page
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import shop.itbug.ticket.admin.model.PageModel
 import shop.itbug.ticket.entry.FileInfo
+import shop.itbug.ticket.entry.FileInfoSaveConfig
 import shop.itbug.ticket.entry.ResourcesCategory
 import shop.itbug.ticket.entry.User
 
@@ -46,27 +48,7 @@ interface FileInfoService {
      */
     fun deleteById(id: Long)
 
-    /**
-     * 将前台存储的图片上传到阿里云oss,并记录数据到数据库
-     * @param pictures 前端上传的文件列表
-     * @param imageType 文件夹类型
-     * @param resourcesCategory 文件所属帖子分类,可以为null
-     * @return  保存到数据库后的列表
-     */
-    fun savePicsToSqlData(
-        pictures: Array<MultipartFile>?,
-        imageType: String,
-        resourcesCategory: ResourcesCategory?
-    ): List<FileInfo>
 
-    /**
-     * 存储一个文件, 只要和文件相关的,都保存为这个对象
-     * @param file 文件
-     * @param type 类型
-     * @param resourcesCategory 可以存储为一个分类, 可以为null
-     * @return 存储后的文件的对象
-     */
-    fun saveFile(file: MultipartFile, type: String, resourcesCategory: ResourcesCategory?): FileInfo
 
     /**
      * 尝试删除一个文件对象
@@ -77,5 +59,9 @@ interface FileInfoService {
 
 
     fun findByUser(user: User, pageModel: PageModel):Page<FileInfo>
+
+    fun getLinkUrl(file: MultipartFile, config: FileInfoSaveConfig): FileInfo?
+
+    fun saveAllFiles(files: List<MultipartFile>, config: FileInfoSaveConfig): MutableSet<FileInfo>
 
 }

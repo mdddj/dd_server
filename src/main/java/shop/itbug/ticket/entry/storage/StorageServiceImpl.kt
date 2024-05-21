@@ -25,21 +25,16 @@ import javax.imageio.ImageIO
 
 
 @Service
-class StorageServiceImpl : StorageAbstract(), StorageService {
+class StorageServiceImpl :  StorageService {
 
 
 
     @Resource
     lateinit var storageRepository: StorageRepository
 
-    @Resource
-    lateinit var fileInfoService: FileInfoService
 
     @Resource
     lateinit var userService: UserService
-
-    @Resource
-    lateinit var minioService: MinioService
 
     @Resource
     lateinit var resourcesCategoryService: ResourcesCategoryService
@@ -65,80 +60,6 @@ class StorageServiceImpl : StorageAbstract(), StorageService {
         return storageRepository.findAll(pageable)
     }
 
-
-    /**
-     * @param subFolderName 不需要带 / 符号  支持的格式 foldere, folder/sub
-     *
-     */
-    @Transactional()
-    override fun getLinkUrl(file: MultipartFile, subFolderName: String, host: String, user: User?): FileInfo? {
-        if (subFolderName.isNotBlank() && subFolderName.startsWith("/")) {
-            throw BizException("目录前不能带 / 符号")
-        }
-        val manager = FileManagerWrapper(file)
-        val nameModel = manager.getFinalName()
-        val finalName = nameModel.name
-        val fileInfo = FileInfo().apply {
-            this.fileName = finalName
-            this.fileSize = file.size
-            this.fileType = FileUtil.extName(finalName)
-            this.createDate = DateUtil.date()
-            this.ext = FileNameUtil.extName(file.originalFilename)
-            this.isImage = file.originalFilename?.let { ImageCheck.isImage(it) }
-            originalFilename = file.originalFilename
-        }
-
-        if (ImageCheck.isImage(finalName)) {
-            getImageDimensions(file)?.let { size -> {
-                fileInfo.width = size.width
-                fileInfo.height = size.height
-            } }
-
-        }
-
-        val model = minioService.uploadFile(file, finalName,subFolderName)
-
-        fileInfo.url = model.url
-        fileInfo.fullUrl = model.fullUrl
-        fileInfo.minioObjectName = model.objectName
-        fileInfo.minioBucketName = model.bucketName
-        fileInfo.user = user
-        return fileInfoService.saveOrUpdate(fileInfo)
-    }
-
-
-    /**
-     * 存储全部图片
-     */
-    @Transactional
-    fun saveAllFiles(
-        files: List<MultipartFile>,
-        subFolderName: String = "",
-        host: String = "",
-        user: User?
-    ): MutableSet<FileInfo> {
-        val fileInfos = mutableSetOf<FileInfo>()
-        files.forEach {
-            fileInfos.add(getLinkUrl(it, subFolderName, host, user) ?: throw BizException("上传图片失败"))
-        }
-        return fileInfos
-    }
-
-    fun getImageDimensions(file: MultipartFile) : Dimension? {
-        try {
-            file.inputStream.use { inputStream ->
-                val image = ImageIO.read(inputStream)
-                if (image != null) {
-                    val width = image.width
-                    val height = image.height
-                    return Dimension(width, height)
-                }
-            }
-            return null
-        } catch (e: IOException) {
-            return null
-        }
-    }
 
 
 }

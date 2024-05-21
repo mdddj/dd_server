@@ -32,7 +32,11 @@ fun Exception?.noAuthenticationResult(): Result<String> {
 }
 
 fun <T> T.successResult(message: String = "操作成功"): ResultJSON<T> {
-    return ResultJSON.ok(this, message)
+    val r = ResultJSON.ok(this, message)
+    if(message == "操作成功"){
+        r.type = ResultDialogType.None
+    }
+     return r
 }
 
 /**
@@ -76,7 +80,7 @@ class Result<T> : Serializable {
     var data: T? = null
 
     @Schema(description = "通知类型:Dialog:弹窗,Toast:吐司,Notice:浮层,None:不展示消息,FinalToast:成功或者失败都展示吐司,FinalDialog: 成功或者失败都展示消息弹窗")
-    var type: ResultDialogType = ResultDialogType.Toast
+    var type: ResultDialogType = ResultDialogType.None
 
 
     @get:Schema(description = "true: 达到预期操作,false: 操作失败,错误信息查看message字段")
@@ -137,7 +141,11 @@ class Result<T> : Serializable {
     companion object {
         const val OTHER = 201
         fun <T> ok(data: T?, msg: String = "操作成功"): Result<T> {
-            return Result(HttpStatus.OK.value(), msg, data)
+            val r = Result(HttpStatus.OK.value(), msg, data)
+            if(msg == "操作成功"){
+                r.type = ResultDialogType.None
+            }
+            return r
         }
 
         fun <T> successMessage(message: String): Result<T> {

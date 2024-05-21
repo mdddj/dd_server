@@ -7,6 +7,7 @@ import {
   findResourceByIdApi,
 } from '@/services/resource/apis';
 import { MyResources } from '@/types/resource';
+import { objectToFormData } from '@/utils/format';
 import {
   PageContainer,
   ProForm,
@@ -64,10 +65,13 @@ export default function Page() {
   const submit = async (values: any): Promise<boolean> => {
     let hide = message.loading('请稍等');
     let pics = values.pictures;
-    if (pics && (pics as any[])) {
-      values.pictures = (pics as any[]).map((v) => v.originFileObj);
+    let formData = objectToFormData(values)
+    if(pics && (pics as any[]) !== undefined){
+      for(let p of pics as any[]){
+        formData.append("pictures",p.originFileObj)
+      }
     }
-    let data = await MyResourceAddPostApi(values);
+    let data = await MyResourceAddPostApi(formData);
     hide();
     message.info(data.message);
     return data.success;

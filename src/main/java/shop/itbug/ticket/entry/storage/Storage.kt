@@ -31,5 +31,4 @@ class Storage {
     @SchemaProperty(name="存储策略类型")
     val type: String? = null
 
-
 }
