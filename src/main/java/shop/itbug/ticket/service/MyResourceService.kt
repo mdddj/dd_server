@@ -3,6 +3,7 @@ package shop.itbug.ticket.service
 import org.springframework.data.domain.Page
 import org.springframework.stereotype.Service
 import shop.itbug.ticket.admin.model.PageModel
+import shop.itbug.ticket.controller.resource.MyResourceControllerWithApp.FindMyResourceListParam
 import shop.itbug.ticket.entry.MyResources
 import shop.itbug.ticket.entry.ResourcesCategory
 import shop.itbug.ticket.entry.User
@@ -34,7 +35,7 @@ interface MyResourceService {
      * @param pageModel 分页
      * @return  查询结果
      */
-    fun findListByResourceCategory(category: ResourcesCategory?, pageModel: PageModel): Page<MyResources>
+    fun findListByResourceCategory(category: ResourcesCategory, pageModel: PageModel): Page<MyResources>
 
     /**
      * 删除一个资源。
@@ -67,7 +68,9 @@ interface MyResourceService {
      */
     fun findListByUser(user: User,pageModel: PageModel) : Page<MyResources>
 
+    fun findListByCategoryId(param: FindMyResourceListParam, pageModel: PageModel): Page<MyResources>
 
+    fun findListAllByCategory(param: FindMyResourceListParam): List<MyResources>
 
     fun deleteByUserAndId(user: User,id: Long)
 }

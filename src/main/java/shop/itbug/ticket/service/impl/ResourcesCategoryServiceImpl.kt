@@ -11,6 +11,8 @@ import shop.itbug.ticket.dao.model.ResourceCategoryTypes
 import shop.itbug.ticket.entry.ResourceType
 import shop.itbug.ticket.entry.ResourcesCategory
 import shop.itbug.ticket.entry.ResourcesCategoryCounter
+import shop.itbug.ticket.exception.BizException
+import shop.itbug.ticket.exception.CommonEnum
 import shop.itbug.ticket.model.ResourceCategoryTreeModel
 import shop.itbug.ticket.service.ResourcesCategoryService
 
@@ -50,12 +52,12 @@ class ResourcesCategoryServiceImpl : ResourcesCategoryService {
         return resourcesCategoryDao.findAll()
     }
 
-    override fun findByObj(category: ResourcesCategory?): ResourcesCategory? {
+    override fun findByObj(category: ResourcesCategory?): ResourcesCategory {
         val one = category?.let { Example.of(it) }?.let { resourcesCategoryDao.findOne(it) }
         if (one != null) {
             return one.orElse(null)
         }
-        return null
+        throw BizException(CommonEnum.NOT_FOUND)
     }
 
     /**
@@ -109,8 +111,8 @@ class ResourcesCategoryServiceImpl : ResourcesCategoryService {
      * @param id 主键查找
      * @return 查找结果
      */
-    override fun findById(id: Long): ResourcesCategory? {
-        return resourcesCategoryDao.findById(id).orElse(null)
+    override fun findById(id: Long): ResourcesCategory {
+        return resourcesCategoryDao.findById(id).orElseThrow { throw BizException(CommonEnum.NOT_FOUND) }
     }
 
     /**

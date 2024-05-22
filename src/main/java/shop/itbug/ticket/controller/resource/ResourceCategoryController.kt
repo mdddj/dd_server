@@ -54,13 +54,13 @@ class ResourceCategoryController {
 
     @GetMapping("/cates")
     @Operation(summary = "查找所有分类")
-    fun findAll(): Result<*> {
+    fun findAll(): Result<List<ResourcesCategory>> {
         return Result.ok(resourcesCategoryService.findAll())
     }
 
     @GetMapping("/find-cate")
     @Operation(summary = "条件查询分类")
-    fun find(category: ResourcesCategory?): Result<*> {
+    fun find(category: ResourcesCategory?): Result<ResourcesCategory> {
         return Result.ok(resourcesCategoryService.findByObj(category))
     }
 }

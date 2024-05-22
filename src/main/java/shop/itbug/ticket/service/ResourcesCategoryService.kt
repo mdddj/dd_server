@@ -38,7 +38,7 @@ interface ResourcesCategoryService {
      * @param category  相似对象
      * @return  查询结果
      */
-    fun findByObj(category: ResourcesCategory?): ResourcesCategory?
+    fun findByObj(category: ResourcesCategory?): ResourcesCategory
 
     /**
      * 根据筛选条件查询全部群组
@@ -73,7 +73,7 @@ interface ResourcesCategoryService {
      * @param id 主键查找
      * @return  查找结果
      */
-    fun findById(id: Long): ResourcesCategory?
+    fun findById(id: Long): ResourcesCategory
 
     /**
      * 查找全部顶部分类菜单

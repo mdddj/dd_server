@@ -70,6 +70,7 @@ open class SecurityConfig {
         "/tkapi/**", //大淘客所有接口放行
         "/api/zhe/**",//折淘客所有接口放行
         "/api/user-public/**",//
+        "/api/rc/**"
     )
 
     @Bean
