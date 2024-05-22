@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional
 import shop.itbug.ticket.admin.model.PageModel
 import shop.itbug.ticket.admin.model.getCurrentPage
 import shop.itbug.ticket.admin.model.getPageable
+import shop.itbug.ticket.controller.resource.MyResourceControllerWithApp
 import shop.itbug.ticket.dao.blog.MyResourcesRepository
 import shop.itbug.ticket.entry.MyResources
 import shop.itbug.ticket.entry.ResourcesCategory
@@ -43,6 +44,15 @@ class MyResourcesServiceImpl : MyResourceService {
         return myResourcesRepository.save(myResources)
     }
 
+
+    override fun findListByCategoryId(
+        param: MyResourceControllerWithApp.FindMyResourceListParam,
+        pageModel: PageModel
+    ): Page<MyResources> {
+        val cate = resourcesCategoryService.findById(param.id)
+        return myResourcesRepository.findAllByCategory(cate,pageModel.getPageable("createDate"))
+    }
+
     /**
      * 列表查询
      *
@@ -65,7 +75,7 @@ class MyResourcesServiceImpl : MyResourceService {
      * @param pageModel 分页
      * @return 查询结果
      */
-    override fun findListByResourceCategory(category: ResourcesCategory?, pageModel: PageModel): Page<MyResources> {
+    override fun findListByResourceCategory(category: ResourcesCategory, pageModel: PageModel): Page<MyResources> {
         // 按照创建时间倒叙查询
         val pageRequest =
             PageRequest.of(pageModel.getCurrentPage(), pageModel.pageSize, Sort.Direction.DESC, "createDate")
@@ -119,7 +129,7 @@ class MyResourcesServiceImpl : MyResourceService {
      * @return 查询结果列表
      */
     override fun findByCategoryId(id: Long): List<MyResources>? {
-        val byId = resourcesCategoryService.findById(id) ?: return ArrayList()
+        val byId = resourcesCategoryService.findById(id)
         return myResourcesRepository.findAllByCategory(byId)
     }
 
@@ -140,4 +150,7 @@ class MyResourcesServiceImpl : MyResourceService {
     }
 
 
+    override fun findListAllByCategory(param: MyResourceControllerWithApp.FindMyResourceListParam): List<MyResources> {
+        return myResourcesRepository.findAllByCategory(resourcesCategoryService.findById(param.id))
+    }
 }

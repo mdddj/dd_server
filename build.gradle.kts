@@ -16,8 +16,6 @@ plugins {
     id("com.google.osdetector") version "1.7.1"
 }
 
-
-
 repositories {
     mavenLocal()
     mavenCentral()
@@ -25,8 +23,6 @@ repositories {
     maven { url = uri("https://repo.maven.apache.org/maven2/") }
     maven { url = uri("https://repo.spring.io/snapshot") }
 }
-
-
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa:${sbVersion}")
@@ -64,7 +60,7 @@ dependencies {
 }
 
 group = "shop.itbug"
-version = "0.0.4"
+version = "0.0.5"
 description = "梁典典的后台服务"
 
 

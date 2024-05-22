@@ -153,17 +153,7 @@ export const request: RequestConfig = {
 
 
 
-export function rootContainer(
-  container:
-    | string
-    | number
-    | boolean
-    | React.ReactElement<any, string | React.JSXElementConstructor<any>>
-    | Iterable<React.ReactNode>
-    | React.ReactPortal
-    | null
-    | undefined,
-) {
+export function rootContainer(container: React.JSX.Element) {
   return (
     <StyleProvider hashPriority="high">
       <NextUIProvider>{container}</NextUIProvider>

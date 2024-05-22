@@ -18,7 +18,6 @@ import shop.itbug.ticket.entry.MyResources
 import shop.itbug.ticket.entry.ResourcesCategory
 import shop.itbug.ticket.entry.User
 import shop.itbug.ticket.entry.share.Share
-import shop.itbug.ticket.entry.storage.StorageServiceImpl
 import shop.itbug.ticket.exception.BizException
 import shop.itbug.ticket.exception.CommonEnum
 import shop.itbug.ticket.model.params.IdBody
@@ -26,9 +25,7 @@ import shop.itbug.ticket.service.FileInfoService
 import shop.itbug.ticket.service.MianjiService
 import shop.itbug.ticket.service.MyResourceService
 import shop.itbug.ticket.service.ResourcesCategoryService
-import shop.itbug.ticket.utils.Result
-import shop.itbug.ticket.utils.ResultJSON
-import shop.itbug.ticket.utils.successResult
+import shop.itbug.ticket.utils.*
 
 @RestController
 @RequestMapping("/api/app/resource/")
@@ -59,6 +56,13 @@ class MyResourceControllerWithApp {
         val findByName = resourcesCategoryService.findByName(name, type)
         val findListByResourceCategory = myResourceService.findListByResourceCategory(findByName, pageModel)
         return findListByResourceCategory.successResult("获取成功")
+    }
+
+
+    data class FindMyResourceListParam(val id : Long)
+    @GetMapping("/findByCateId")
+    fun findResourceListByCategoryId(param: FindMyResourceListParam) : Result<List<MyResources>> {
+        return myResourceService.findListAllByCategory(param).successResult()
     }
 
 
