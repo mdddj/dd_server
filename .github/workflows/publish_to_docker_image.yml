@@ -87,7 +87,7 @@ jobs:
           file: ./Dockerfile
           platforms: linux/amd64,linux/arm64/v8
           push: true
-          tags: ${{ github.event.release.tag_name }}
+          tags: liangdiandian/dd_server:${{ github.event.release.tag_name }}
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: 上传jar包到 ${{github.event.release.tag_name}}

@@ -56,6 +56,8 @@ dd_server_admin/.vscode
 dd_server_admin/.husky
 dd_server_admin/src/.umi-production
 dd_server_admin/src/.umi
+dd_server_admin/pnpm-lock.yaml
+
 
 .ideaDataSources
 dataSources
