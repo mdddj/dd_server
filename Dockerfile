@@ -8,5 +8,5 @@ ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY dd_server_admin/dist /home/admin/
-ENTRYPOINT ["sh", "-c", "nginx -g 'daemon off;' & java -jar /dd_service.jar"]
+ENTRYPOINT ["sh", "-c", "nginx -g 'daemon off;' & java -jar /dd_service.jar --spring.profiles.active=docker"]
 EXPOSE 8082 8083
