@@ -3,7 +3,6 @@ package shop.itbug.ticket.config
 import jakarta.annotation.Resource
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.annotation.Order
@@ -58,7 +57,6 @@ open class SecurityConfig {
         "/index",
         "/js/**",
         "/css/**",
-        "/privacy",
         "/wm",
         "/api/app/**",
         "/actuator/**",
@@ -78,23 +76,26 @@ open class SecurityConfig {
     @Throws(Exception::class)
     open fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http.anonymous {}
-            .cors().and().csrf().disable()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+            .cors(Customizer.withDefaults()).csrf(Customizer.withDefaults())
+            .sessionManagement {
+                it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            }
+            .addFilterBefore(
+                JwtTokenBeforeFilter(userService),
+                UsernamePasswordAuthenticationFilter::class.java
+            )
+            .addFilterBefore(emailLoginAuthenticationFilter(), UsernamePasswordAuthenticationFilter::class.java)
+            .addFilterBefore(
+                accountLoginAuthenticationFilter(),
+                UsernamePasswordAuthenticationFilter::class.java
+            )
             .authorizeHttpRequests {
                 it.requestMatchers("/api/v1/dtk/detail/**").hasAuthority("admin")
                 it.requestMatchers("/api/role/**").hasAuthority("admin")
-                it.requestMatchers(*getPermitUrls().toTypedArray()).permitAll().anyRequest().authenticated().and()
-                    .addFilterBefore(
-                        JwtTokenBeforeFilter(userService),
-                        UsernamePasswordAuthenticationFilter::class.java
-                    )
-                    .addFilterBefore(emailLoginAuthenticationFilter(), UsernamePasswordAuthenticationFilter::class.java)
-                    .addFilterBefore(
-                        accountLoginAuthenticationFilter(),
-                        UsernamePasswordAuthenticationFilter::class.java
-                    )
+                it.requestMatchers(*getPermitUrls().toTypedArray()).permitAll().anyRequest().authenticated()
+
             }
-            .httpBasic().and()
+            .httpBasic(Customizer.withDefaults())
             .exceptionHandling {
                 it.accessDeniedHandler(securityNoAccessResultFilter)
                 it.authenticationEntryPoint(restAuthenticationEntryPoint)

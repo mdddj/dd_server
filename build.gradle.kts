@@ -7,12 +7,12 @@ val sbVersion = "3.2.5"
 plugins {
     `maven-publish`
     idea
-    id("org.jetbrains.kotlin.jvm") version "2.0.0-RC3"
+    id("org.jetbrains.kotlin.jvm") version "2.0.0"
     id("org.springframework.boot") version "3.2.5"
     id("org.springdoc.openapi-gradle-plugin") version "1.8.0"
-    kotlin("plugin.spring") version "2.0.0-RC3"
+    kotlin("plugin.spring") version "2.0.0"
     id("io.spring.dependency-management") version "1.1.4"
-    kotlin("plugin.serialization") version "2.0.0-RC3"
+    kotlin("plugin.serialization") version "2.0.0"
     id("com.google.osdetector") version "1.7.1"
 }
 
@@ -76,6 +76,7 @@ tasks.withType<KotlinCompile> {
         jvmTarget = JvmTarget.JVM_21
     }
 }
+
 
 
 tasks.named<Test>("test") {

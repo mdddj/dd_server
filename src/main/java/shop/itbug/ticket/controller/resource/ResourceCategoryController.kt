@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.RestController
 import shop.itbug.ticket.dao.model.ResourceCategoryTypes
 import shop.itbug.ticket.entry.ResourcesCategory
 import shop.itbug.ticket.entry.ResourcesCategoryCounter
-import shop.itbug.ticket.exception.BizException
-import shop.itbug.ticket.exception.CommonEnum
 import shop.itbug.ticket.service.ResourcesCategoryService
 import shop.itbug.ticket.utils.Result
 import shop.itbug.ticket.utils.ResultJSON
@@ -48,7 +46,7 @@ class ResourceCategoryController {
     @GetMapping("/findById")
     @Operation(summary = "根据id查找分类")
     fun findById(id: Long) : ResultJSON<ResourcesCategory> {
-        val result =  resourcesCategoryService.findById(id) ?: throw BizException(CommonEnum.NOT_FOUND)
+        val result = resourcesCategoryService.findById(id)
         return ResultJSON.ok(result)
     }
 
@@ -60,7 +58,7 @@ class ResourceCategoryController {
 
     @GetMapping("/find-cate")
     @Operation(summary = "条件查询分类")
-    fun find(category: ResourcesCategory?): Result<ResourcesCategory> {
+    fun find(category: ResourcesCategory): Result<ResourcesCategory> {
         return Result.ok(resourcesCategoryService.findByObj(category))
     }
 }

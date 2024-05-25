@@ -23,15 +23,16 @@ const Page: React.FC = () => {
   const [content, setContent] = useState('');
 
   let updateId = searchParams.get('update');
-  let isUpdate = updateId !== null && updateId !== undefined;
-
-  const fetchBlogCategory = async () => {
+    const fetchBlogCategory = async () => {
     const result = await GetBlogCategorys();
     setCategoryList(result.data);
   };
 
   const updateBlog = async () => {
-    let result = await GetBlogById(updateId!!);
+    if(!updateId){
+      return
+    }
+    let result = await GetBlogById(updateId);
     setBlog(result.data);
     setTags(result.data.tags.map((value) => value.name));
     form.setFieldsValue({

@@ -38,7 +38,7 @@ interface ResourcesCategoryService {
      * @param category  相似对象
      * @return  查询结果
      */
-    fun findByObj(category: ResourcesCategory?): ResourcesCategory
+    fun findByObj(category: ResourcesCategory): ResourcesCategory
 
     /**
      * 根据筛选条件查询全部群组
@@ -66,7 +66,7 @@ interface ResourcesCategoryService {
      * @param name 模糊查询文本
      * @return  查询结果列表
      */
-    fun findListByLikeName(name: String?): List<ResourcesCategory>
+    fun findListByLikeName(name: String): List<ResourcesCategory>
 
     /**
      * 查找对象
@@ -132,4 +132,9 @@ interface ResourcesCategoryService {
      * 注意: 如果没找到会立即新建一个分组
      */
     fun findByName(name: String, type: String = ""): ResourcesCategory
+
+    /**
+     * 批量删除群组
+     */
+    fun deleteList(ids: List<Long>)
 }

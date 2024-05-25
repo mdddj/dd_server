@@ -91,7 +91,7 @@ open class WebConfig : WebMvcConfigurationSupport() {
                 JSONWriter.Feature.WriteNullStringAsEmpty,
                 JSONWriter.Feature.WriteNulls,
                 JSONWriter.Feature.WriteEnumUsingToString,
-                JSONWriter.Feature.MapSortField,
+                JSONWriter.Feature.SortMapEntriesByKeys,
                 JSONWriter.Feature.WriteNullStringAsEmpty,
             )
             return config

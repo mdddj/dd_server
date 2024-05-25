@@ -44,6 +44,10 @@ class ResourcesCategoryServiceImpl : ResourcesCategoryService {
                 this.type = type })
     }
 
+    override fun deleteList(ids: List<Long>) {
+        resourcesCategoryDao.deleteAllById(ids)
+    }
+
     override fun count(): Long {
         return resourcesCategoryDao.count()
     }
@@ -52,12 +56,9 @@ class ResourcesCategoryServiceImpl : ResourcesCategoryService {
         return resourcesCategoryDao.findAll()
     }
 
-    override fun findByObj(category: ResourcesCategory?): ResourcesCategory {
-        val one = category?.let { Example.of(it) }?.let { resourcesCategoryDao.findOne(it) }
-        if (one != null) {
-            return one.orElse(null)
-        }
-        throw BizException(CommonEnum.NOT_FOUND)
+    override fun findByObj(category: ResourcesCategory): ResourcesCategory {
+        val one = resourcesCategoryDao.findOne(Example.of(category))
+        return one.orElseThrow { throw BizException(CommonEnum.NOT_FOUND) }
     }
 
     /**
@@ -101,7 +102,7 @@ class ResourcesCategoryServiceImpl : ResourcesCategoryService {
      * @param name 模糊查询文本
      * @return 查询结果列表
      */
-    override fun findListByLikeName(name: String?): List<ResourcesCategory> {
+    override fun findListByLikeName(name: String): List<ResourcesCategory> {
         return resourcesCategoryDao.findAllByNameLike(name)
     }
 
@@ -180,12 +181,10 @@ class ResourcesCategoryServiceImpl : ResourcesCategoryService {
         val findedCategory = findById(id)
         val ids = selectAllChildrenIds(id)
         val treeModel = ResourceCategoryTreeModel()
-        if (findedCategory != null) {
-            treeModel.id = findedCategory.id
-            treeModel.logo = findedCategory.logo
-            treeModel.title = findedCategory.name
-            treeModel.childrenIds = ids
-        }
+         treeModel.id = findedCategory.id
+        treeModel.logo = findedCategory.logo
+        treeModel.title = findedCategory.name
+        treeModel.childrenIds = ids
         treeModel.hasChildren = ids.isNotEmpty()
         if (ids.isNotEmpty()) {
             val resourceCategoryTreeModels = ArrayList<ResourceCategoryTreeModel>()
