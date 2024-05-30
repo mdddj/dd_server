@@ -246,14 +246,11 @@ open class AdminAuthController {
     fun deleteResourceCategory(@RequestBody jsonObject: JSONObject): Result<*> {
         val id = jsonObject.getLong("id")
         if (id != null) {
-
             // 判断该群组下面是否存在资源文件
             val byId = resourcesCategoryService.findById(id)
-            if (byId != null) {
-                val listByResourceCategory = myResourceService.findListByResourceCategory(byId, PageModel(0, 10))
-                if (listByResourceCategory.totalElements != 0L) {
-                    return Result.err("删除失败,如果需要删除请先删除该群组下面的全部资源")
-                }
+            val listByResourceCategory = myResourceService.findListByResourceCategory(byId, PageModel(0, 10))
+            if (listByResourceCategory.totalElements != 0L) {
+                return Result.err("删除失败,如果需要删除请先删除该群组下面的全部资源")
             }
             resourcesCategoryService.deleteById(id)
             return Result.ok("删除成功")
@@ -299,19 +296,17 @@ open class AdminAuthController {
     // 生成文件夹导航
     private fun gengerNavString(id: Long, navs: TreeSet<NavLink>): TreeSet<NavLink> {
         val byId = resourcesCategoryService.findById(id)
-        if (byId != null) {
-            if (byId.parentNode != null) {
-                val navLink1 = NavLink()
-                navLink1.name = byId.name
-                navLink1.id = byId.id
-                navs.add(navLink1)
-                return gengerNavString(byId.parentNode!!.id!!, navs)
-            } else {
-                val navLink = NavLink()
-                navLink.id = byId.id
-                navLink.name = byId.name
-                navs.add(navLink)
-            }
+        if (byId.parentNode != null) {
+            val navLink1 = NavLink()
+            navLink1.name = byId.name
+            navLink1.id = byId.id
+            navs.add(navLink1)
+            return gengerNavString(byId.parentNode!!.id!!, navs)
+        } else {
+            val navLink = NavLink()
+            navLink.id = byId.id
+            navLink.name = byId.name
+            navs.add(navLink)
         }
         return navs
     }
@@ -355,7 +350,7 @@ open class AdminAuthController {
         val linkUrl =
             fileInfoService.getLinkUrl(file, config)
                 ?: throw BizException("上传图片失败")
-        val resourceCategory = resourcesCategoryService.findById(id) ?: throw BizException("查找分类失败")
+        val resourceCategory = resourcesCategoryService.findById(id)
         resourceCategory.logo = linkUrl.thumbnail
         resourceCategory.fileInfo = linkUrl
         return resourcesCategoryService.save(resourceCategory).successResult()
@@ -407,25 +402,6 @@ open class AdminAuthController {
         } catch (e: IOException) {
             throw BizException(CommonEnum.INTERNAL_SERVER_ERROR)
         }
-    }
-
-    /**
-     * 获取存放文件绝对路径
-     *
-     * @param categoryId 文件夹id
-     * @param folderPath 文件夹路径  空值为根目录
-     * @return 绝对路径
-     */
-    private fun checkParenFolder(categoryId: Long, folderPath: String): String {
-        val finded = resourcesCategoryService.findById(categoryId)
-        var folderpath = folderPath
-        if (finded != null) {
-            folderpath = finded.name + "/"
-            if (finded.parentNode != null) {
-                folderpath += finded.id?.let { checkParenFolder(it, folderpath) }
-            }
-        }
-        return folderpath
     }
 
     /**
@@ -596,7 +572,6 @@ open class AdminAuthController {
                 Result.ok(saved)
             } else {
                 val findUpdateObject = resourcesCategoryService.findById(params.updateId!!)
-                    ?: throw BizException("未找到对象")
                 findUpdateObject.name = params.name
                 val updatedObject = resourcesCategoryService.save(findUpdateObject)
                 Result.ok(updatedObject)

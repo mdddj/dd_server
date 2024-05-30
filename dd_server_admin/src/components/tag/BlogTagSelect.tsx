@@ -1,6 +1,8 @@
+import { getAllTags } from '@/services/blog/BlogController';
 import { PlusOutlined } from '@ant-design/icons';
-import type { InputRef } from 'antd';
-import { Input, Tag, theme } from 'antd';
+import { useRequest } from '@umijs/max';
+import {Button, InputRef} from 'antd';
+import { Input, Spin, Tag, theme } from 'antd';
 import { TweenOneGroup } from 'rc-tween-one';
 import React, { useEffect, useRef, useState } from 'react';
 type TagSelectProps = {
@@ -12,6 +14,8 @@ const TagSelect: React.FC<TagSelectProps> = ({ onChange, tags }) => {
   const [inputVisible, setInputVisible] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const inputRef = useRef<InputRef>(null);
+
+  const {data: serverTags, loading: tagsLoading} = useRequest(()=>getAllTags())
 
   useEffect(() => {
     if (inputVisible) {
@@ -34,12 +38,16 @@ const TagSelect: React.FC<TagSelectProps> = ({ onChange, tags }) => {
   };
 
   const handleInputConfirm = () => {
-    if (inputValue && tags.indexOf(inputValue) === -1) {
-      onChange([...tags, inputValue]);
+    handleTagClick(inputValue)
+  };
+
+  const handleTagClick = (tag: string) => {
+    if (tag && tags.indexOf(tag) === -1) {
+      onChange([...tags, tag]);
     }
     setInputVisible(false);
     setInputValue('');
-  };
+  }
 
   const forMap = (tag: string) => {
     const tagElem = (
@@ -69,6 +77,24 @@ const TagSelect: React.FC<TagSelectProps> = ({ onChange, tags }) => {
 
   return (
     <>
+
+      {tagsLoading && <Spin />}
+
+      {
+        serverTags?.length !== 0 && <div className='mb-2 card shadow'>
+          <div className={'card-body '}>
+            <h3 className={'font-bold text-lg'}>从已有标签中选择</h3>
+            <div className={'flex flex-wrap gap-2'}>
+              {
+                serverTags?.map(item=><Button disabled={tags.indexOf(item.name)!==-1} size={'small'} key={item.id} onClick={()=>{
+                  handleTagClick(item.name)
+                }}>{item.name}</Button>)
+              }
+            </div>
+          </div>
+        </div>
+      }
+
       <div style={{ marginBottom: 16 }}>
         <TweenOneGroup
           enter={{

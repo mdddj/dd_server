@@ -23,6 +23,8 @@ import shop.itbug.ticket.service.blog.BlogService
 import shop.itbug.ticket.service.blog.CategoryService
 import shop.itbug.ticket.service.blog.TagService
 import shop.itbug.ticket.service.blog.TextService
+import shop.itbug.ticket.service.config.MiniAppConfig
+import shop.itbug.ticket.service.config.MiniAppConfigModel
 import shop.itbug.ticket.utils.*
 
 /**
@@ -49,6 +51,8 @@ class BlogController {
 
     @Resource
     private lateinit var projectService: ProjectService
+
+    @Resource private lateinit var miniAppConfig: MiniAppConfig
 
     /**
      * 获取分类列表
@@ -213,8 +217,8 @@ class BlogController {
      */
     @GetMapping("/tags")
     @Operation(summary = "获取全部标签列表")
-    fun getTags(): Result<*> {
-        val tags = tagService.selectAll()
+    fun getTags(): Result<List<shop.itbug.ticket.entry.blog.Tag>> {
+        val tags: List<shop.itbug.ticket.entry.blog.Tag> = tagService.selectAll()
         return Result(tags, "获取成功")
     }
 
@@ -299,4 +303,10 @@ class BlogController {
     fun findAllProjects() : R<List<Project>> {
         return projectService.findAll().successResult("获取成功")
     }
+
+    @GetMapping("/miniapp-config")
+    @Operation(summary = "典典博客小程序的配置")
+    fun getMiniAppConfig(): R<MiniAppConfigModel> = miniAppConfig.setting.successResult()
+
+
 }

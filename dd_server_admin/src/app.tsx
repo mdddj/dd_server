@@ -3,7 +3,7 @@ import { getJwtToken, removeJwtToken } from '@/utils/cache';
 import { history } from '@@/core/history';
 import { AxiosResponse, RequestConfig, RequestError, RequestOptions, } from '@@/plugin-request/request';
 import { StyleProvider } from '@ant-design/cssinjs';
-import { message, Modal } from 'antd';
+import {App, message, Modal} from 'antd';
 import dayjs from 'dayjs';
 import 'dayjs/locale/zh-cn';
 
@@ -155,8 +155,10 @@ export const request: RequestConfig = {
 
 export function rootContainer(container: React.JSX.Element) {
   return (
-    <StyleProvider hashPriority="high">
-      <NextUIProvider>{container}</NextUIProvider>
-    </StyleProvider>
+    <App>
+      <StyleProvider hashPriority="high">
+        <NextUIProvider>{container}</NextUIProvider>
+      </StyleProvider>
+    </App>
   );
 }

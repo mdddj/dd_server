@@ -1,23 +1,23 @@
-name: 打包上传
-on:
-  push:
-    branches:
-      - main
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-
-        node-version: [ 20 ]
-    steps:
-      - uses: actions/checkout@v4
-      - name: 发布到服务器
-        uses: easingthemes/ssh-deploy@v5.0.3
-        env:
-          REMOTE_HOST: ${{ secrets.HOST }}
-          REMOTE_USER: ${{ secrets.USER }}
-          SSH_PRIVATE_KEY: ${{ secrets.PASS }}
-          REMOTE_PORT: ${{ secrets.PORT }}
-          SOURCE: "dd_server_admin/dist/"
-          TARGET: ${{ secrets.PATH }}
+#name: 打包上传
+#on:
+#  push:
+#    branches:
+#      - main
+#jobs:
+#  build:
+#    runs-on: ubuntu-latest
+#    strategy:
+#      matrix:
+#
+#        node-version: [ 20 ]
+#    steps:
+#      - uses: actions/checkout@v4
+#      - name: 发布到服务器
+#        uses: easingthemes/ssh-deploy@v5.0.3
+#        env:
+#          REMOTE_HOST: ${{ secrets.HOST }}
+#          REMOTE_USER: ${{ secrets.USER }}
+#          SSH_PRIVATE_KEY: ${{ secrets.PASS }}
+#          REMOTE_PORT: ${{ secrets.PORT }}
+#          SOURCE: "dd_server_admin/dist/"
+#          TARGET: ${{ secrets.PATH }}

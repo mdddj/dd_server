@@ -1,17 +1,16 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val sbVersion = "3.2.5"
+val sbVersion = "3.3.0"
 
 
 plugins {
     `maven-publish`
     idea
     id("org.jetbrains.kotlin.jvm") version "2.0.0"
-    id("org.springframework.boot") version "3.2.5"
-    id("org.springdoc.openapi-gradle-plugin") version "1.8.0"
+    id("org.springframework.boot") version "3.3.0"
     kotlin("plugin.spring") version "2.0.0"
-    id("io.spring.dependency-management") version "1.1.4"
+    id("io.spring.dependency-management") version "1.1.5"
     kotlin("plugin.serialization") version "2.0.0"
     id("com.google.osdetector") version "1.7.1"
 }
@@ -33,7 +32,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web:${sbVersion}")
     implementation("org.springframework.boot:spring-boot-starter-webflux:${sbVersion}")
     implementation("io.lettuce:lettuce-core:latest.release")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.0-Beta2")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:latest.release")
     implementation("com.alibaba.fastjson2:fastjson2:latest.release")
     implementation("com.alibaba.fastjson2:fastjson2-kotlin:latest.release")
     implementation("com.alibaba.fastjson2:fastjson2-extension-spring6:latest.release")
@@ -60,7 +59,7 @@ dependencies {
 }
 
 group = "shop.itbug"
-version = "0.0.5"
+version = "0.0.8"
 description = "梁典典的后台服务"
 
 

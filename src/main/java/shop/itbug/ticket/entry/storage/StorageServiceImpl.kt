@@ -28,7 +28,6 @@ import javax.imageio.ImageIO
 class StorageServiceImpl :  StorageService {
 
 
-
     @Resource
     lateinit var storageRepository: StorageRepository
 

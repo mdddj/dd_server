@@ -1,4 +1,16 @@
-FROM openjdk:17
-ADD ./build/libs/dd_service-2.0.2.jar dd_service.jar
-ENTRYPOINT ["java","-jar","/dd_service.jar"]
-EXPOSE 8088
+
+
+
+sudo docker run --name dd_api --network=1panel-network \
+ -p 8082:8082 \
+ -p 8083:8083 \
+ -e MYSQL_URL=1Panel-mysql-Z4Mc:3306 \
+ -e MYSQL_DATABASE=test \
+ -e MYSQL_USERNAME=root \
+ -e MYSQL_PASSWORD=hlx5219765 \
+ -e REDIS_HOST=1Panel-redis-F20g \
+ -e REDIS_PORT=6379 \
+ -e REDIS_PASSWORD=hlx5219765 \
+ -e spring.profiles.active=docker \
+ -v /dd-service-config:/root/.dd \
+liangdiandian/dd_server:0.0.6

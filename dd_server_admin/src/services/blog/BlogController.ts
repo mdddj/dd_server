@@ -1,4 +1,4 @@
-import { Blog, BlogCategory } from '@/types/blog';
+import { Blog, BlogCategory, BlogTag } from '@/types/blog';
 import { CoverToPageData, JpaPage, Result } from '@/types/result';
 import { request } from '@umijs/max';
 
@@ -68,4 +68,14 @@ export async function MyBlogControllerWithUpdateBlogCategory(
     method: 'POST',
     data: params,
   });
+}
+
+/**
+ * 获取全部博客tag
+ * @returns 
+ */
+export async function getAllTags(): Promise<Result<BlogTag[]>> {
+  return request('/api/blog/tags', {
+    method: 'GET'
+  })
 }

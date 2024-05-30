@@ -218,9 +218,14 @@ class BlogServiceImpl : BlogService {
      * @param blog 要修改的内容
      * @return 修改后的博客
      */
-    @CacheEvict(
-        value = [RedisKeys.BLOG_KEY + "pageable-select", RedisKeys.BLOG_KEY + "all", RedisKeys.BLOG_KEY + "getMonthBlogsWithMonth", RedisKeys.BLOG_KEY + "statistics"],
-        allEntries = true
+    @Caching(
+        evict = [
+            CacheEvict(value = [RedisKeys.BLOG_KEY + "selectById"], key = "#blog.id"),
+            CacheEvict(
+                value = [RedisKeys.BLOG_KEY + "pageable-select", RedisKeys.BLOG_KEY + "all", RedisKeys.BLOG_KEY + "getMonthBlogsWithMonth", RedisKeys.BLOG_KEY + "statistics"],
+                allEntries = true
+            )
+        ]
     )
     override fun update(blog: Blog): Blog {
         return blogDao.save(blog)

@@ -5,6 +5,7 @@ import { Form, Input, Card, Button } from 'antd';
 import { request } from '@umijs/max';
 import { Result } from '@/types/result';
 import {removeJwtToken} from "@/utils/cache";
+import MiniAppConfigModelForm from "@/pages/miniapp/MiniAppConfigSetting";
 
 ///个人设置页面
 export default function Page() {
@@ -25,6 +26,11 @@ export default function Page() {
         <Tab key={'profile'} title={'个人资料'}>
           <Card>
             ...
+          </Card>
+        </Tab>
+        <Tab key={'mini-app-config'} title={'小程序配置'}>
+          <Card>
+            <MiniAppConfigModelForm trigger={<Button>修改配置</Button>}/>
           </Card>
         </Tab>
         <Tab key={'password'} title={'修改密码'}>
