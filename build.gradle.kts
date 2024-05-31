@@ -3,6 +3,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val sbVersion = "3.3.0"
 
+group = "shop.itbug"
+version = "0.1.0"
+description = "梁典典的后台服务"
+
 
 plugins {
     `maven-publish`
@@ -58,9 +62,7 @@ dependencies {
     }
 }
 
-group = "shop.itbug"
-version = "0.0.9"
-description = "梁典典的后台服务"
+
 
 
 

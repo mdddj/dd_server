@@ -7,7 +7,8 @@ class RedisKeys {
         const val CATEGORY: String = "category__"
         const val FRIEND: String ="friends_link__"
         const val TEXT: String = "text_model__"
-        const val DTK: String = "dtk_"
+        const val ZHE_TAO_KE: String = "zheTaoke_"
+        const val DTK_SERVICE: String = "dtk_service_"
         const val TAG: String = "tag_"
         const val PROJECT: String = "project_"
     }

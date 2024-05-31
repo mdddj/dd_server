@@ -6,6 +6,7 @@ import com.alibaba.fastjson2.JSONObject
 import jakarta.annotation.Resource
 import kotlinx.serialization.json.Json
 import org.apache.commons.lang3.StringUtils
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import shop.itbug.ticket.ex.log
 import shop.itbug.ticket.exception.BizException
@@ -18,6 +19,7 @@ import shop.itbug.ticket.model.zhe.MeitunTuiGuangParam
 import shop.itbug.ticket.model.zhe.WeipinghuiXianbaoParam
 import shop.itbug.ticket.service.ZheTkService
 import shop.itbug.ticket.service.config.ZheConfigService
+import shop.itbug.ticket.service.redis.RedisKeys
 import java.util.*
 
 @Service
@@ -31,6 +33,7 @@ class ZheTkServiceImpl : ZheTkService {
      * @param param 参数
      * @return json
      */
+    @Cacheable(RedisKeys.ZHE_TAO_KE+"getMeiTuan#24",key = "#param")
     override fun getMeiTuan(param: MeitunTuiGuangParam): MeituanResult? {
         val copy = mutableMapOf<String, Any?>()
         copy.putAll(paramsMap)
@@ -67,6 +70,7 @@ class ZheTkServiceImpl : ZheTkService {
      * @param codeType    邀请码类型，1 - 渠道邀请，2 - 渠道裂变，3 -会员邀请
      * @param relationId  渠道关系ID
      */
+    @Cacheable(RedisKeys.ZHE_TAO_KE+"channelGeneration#1",key = "#relationApp+'_'+#codeType+'_'+#relationId")
     override fun channelGeneration(relationApp: String, codeType: String, relationId: String): String? {
         val paramsMap = mutableMapOf<String, Any?>()
         val s = zheConfigService.setting
@@ -102,6 +106,7 @@ class ZheTkServiceImpl : ZheTkService {
     /**
      * 获取渠道方列表
      */
+    @Cacheable(RedisKeys.ZHE_TAO_KE+"openScPublisherGet#1",key = "#params")
     override fun openScPublisherGet(params: OpenScPublisherGetParam): ScResult {
         val toMutableMap = params.toMutableMap()
         toMutableMap.putAll(zheConfigService.getRequestParam())
@@ -114,7 +119,7 @@ class ZheTkServiceImpl : ZheTkService {
         }
     }
 
-
+    @Cacheable(RedisKeys.ZHE_TAO_KE+"findScItem#1",key = "#userId")
     override fun findScItem(userId: Long): TbkScPublisherInfoGetResponseMapDatum? {
         val openScPublisherGet = openScPublisherGet(OpenScPublisherGetParam(infoType = 1, relationApp = "common"))
         return openScPublisherGet.tbkScPublisherInfoGetResponse.data.inviterList.mapData.find { it.rtag != null && it.rtag.toLong() == userId }
@@ -126,6 +131,7 @@ class ZheTkServiceImpl : ZheTkService {
      * @param param 参数
      * @return json
      */
+    @Cacheable(RedisKeys.ZHE_TAO_KE+"getWPHXianbao#1",key = "#param")
     override fun getWPHXianbao(param: WeipinghuiXianbaoParam): String? {
         val map = mutableMapOf<String, Any?>()
         map["page"] = param.page
@@ -144,6 +150,7 @@ class ZheTkServiceImpl : ZheTkService {
      * @param idOrUrl id或者url
      * @return json
      */
+    @Cacheable(RedisKeys.ZHE_TAO_KE+"wepProductJx#1",key = "#idOrUrl", unless = "idOrUrl!=null")
     override fun wepProductJx(idOrUrl: String?): String? {
         val url = "https://api.zhetaoke.com:10001/api/open_vip_getByGoodsIdsWithOauth.ashx"
         val paramsMap = paramsMapWph
@@ -158,6 +165,7 @@ class ZheTkServiceImpl : ZheTkService {
      * @param type 淘客授权页面类型，1：电脑版授权页面，0：手机版授权页面，默认值1
      * @return 登录 url 发给用户进行登录授权的url
      */
+    @Cacheable(RedisKeys.ZHE_TAO_KE+"taokeShouquan#1",key = "#type")
     override fun taokeShouquan(type: String?): String? {
         val url = "https://api.zhetaoke.com:10001/api/open_taokeshouquan.ashx"
         val params = TreeMap<String, Any?>()
@@ -200,6 +208,7 @@ class ZheTkServiceImpl : ZheTkService {
      *
      * @return 产品列表
      */
+    @get:Cacheable(RedisKeys.ZHE_TAO_KE + "bestSellerProducts#2")
     override val bestSellerProducts: String?
         get() {
             val url = "https://api.zhetaoke.com:10001/api/api_quantian.ashx"
@@ -212,6 +221,7 @@ class ZheTkServiceImpl : ZheTkService {
             return HttpUtil.get(url, params)
         }
 
+    @Cacheable(RedisKeys.ZHE_TAO_KE + "getCarouselList#8")
     override fun getCarouselList(): JSONObject {
         val url = "https://api.zhetaoke.com:10001/api/api_lunbo.ashx"
         val params = TreeMap<String, Any>()
@@ -223,6 +233,7 @@ class ZheTkServiceImpl : ZheTkService {
         return parseObj
     }
 
+    @get:Cacheable(RedisKeys.ZHE_TAO_KE + "getAppKey#8")
     override val getAppKey: String
         get() = zheConfigService.setting.appKey
 

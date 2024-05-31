@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSON
 import com.alibaba.fastjson2.JSONObject
 import jakarta.annotation.Resource
 import org.apache.commons.lang3.StringUtils
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import shop.itbug.ticket.constant.DTKApiConstant
 import shop.itbug.ticket.exception.BizException
@@ -12,16 +13,17 @@ import shop.itbug.ticket.exception.ResultDialogType
 import shop.itbug.ticket.model.params.*
 import shop.itbug.ticket.service.DTKApiService
 import shop.itbug.ticket.service.DTKReqeestService
+import shop.itbug.ticket.service.redis.RedisKeys
 import shop.itbug.ticket.service.util.ParamUtil
 import shop.itbug.ticket.utils.Result
 import java.util.*
 
 
-fun TreeMap<*,*>.toMutableMap() : MutableMap<String,Any>{
-    val map = mutableMapOf<String,Any>()
+fun TreeMap<*, *>.toMutableMap(): MutableMap<String, Any> {
+    val map = mutableMapOf<String, Any>()
     forEach { (any, any2) ->
         run {
-            if(any2 != null && any2.toString().trim().isNotBlank()){
+            if (any2 != null && any2.toString().trim().isNotBlank()) {
                 map[any.toString()] = any2
             }
         }
@@ -30,11 +32,11 @@ fun TreeMap<*,*>.toMutableMap() : MutableMap<String,Any>{
 }
 
 
-fun <T> T.toMapParams() : MutableMap<String,Any>{
+fun <T> T.toMapParams(): MutableMap<String, Any> {
     try {
-        val treeMap = JSON.parseObject(JSONObject.toJSONString(this),TreeMap::class.java)
+        val treeMap = JSON.parseObject(JSONObject.toJSONString(this), TreeMap::class.java)
         return treeMap.toMutableMap()
-    }catch (e:Exception){
+    } catch (e: Exception) {
         throw BizException("转换模型失败:$e")
     }
 }
@@ -63,10 +65,11 @@ class DTKRequestServiceImpl : DTKReqeestService {
      *
      * @return json字符串
      */
+    @get:Cacheable(RedisKeys.DTK_SERVICE + "category#24")
     override val category: String
         get() {
             val host = "https://openapi.dataoke.com/api/category/get-super-category"
-            return  dtkApiService.request(host, mutableMapOf(), DTKApiConstant.CATEGORY_VERSION)
+            return dtkApiService.request(host, mutableMapOf(), DTKApiConstant.CATEGORY_VERSION)
         }
 
     /**
@@ -75,6 +78,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param goodsListParams 参数
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE + "productList#20#m", key = "#goodsListParams")
     override fun getProductList(goodsListParams: GoodsListParams): String {
         val url = "https://openapi.dataoke.com/api/goods/get-goods-list"
         return dtkApiService.request(url, goodsListParams.toMapParams(), DTKApiConstant.PRODUCT_LIST_VERSION)
@@ -86,6 +90,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param paramsModel 参数
      * @return 大淘客data json数据字符串
      */
+    @Cacheable(RedisKeys.DTK_SERVICE + "getBrandList#24", key = "#paramsModel")
     override fun getBrandList(paramsModel: BrandListParamsModel): String {
         if (StringUtils.isBlank(paramsModel.pageId) || StringUtils.isBlank(paramsModel.pageSize) || StringUtils.isBlank(
                 paramsModel.cid
@@ -103,10 +108,11 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param pageSize 每页记录条数（每页支持最大记录条数100）
      * @return 大淘客data json数据字符串
      */
+    @Cacheable(RedisKeys.DTK_SERVICE + "getBrandDetail#24", key = "#brandId+'_'+#pageId+'_'+#pageSize")
     override fun getBrandDetail(brandId: String, pageId: String, pageSize: String): String {
 
         val url = "https://openapi.dataoke.com/api/delanys/brand/get-goods-list"
-        val initParamMap = mutableMapOf<String,Any>()
+        val initParamMap = mutableMapOf<String, Any>()
         initParamMap["brandId"] = brandId
         initParamMap["pageId"] = pageId
         initParamMap["pageSize"] = pageSize
@@ -120,6 +126,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param paramsModel 参数列表
      * @return 大淘客data json数据字符串
      */
+    @Cacheable(RedisKeys.DTK_SERVICE + "getCommentList#24", key = "#paramsModel")
     override fun getCommentList(paramsModel: CommentParamsModel): String {
         if (StringUtils.isBlank(paramsModel.id) && StringUtils.isBlank(paramsModel.goodsId)) throw BizException(
             CommonEnum.PARAMS_ERROR
@@ -134,6 +141,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param params 参数
      * @return json数据
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"shopConvert#1", key = "#params")
     override fun shopConvert(params: ShopConvertParamsModel): String {
         if (StringUtils.isBlank(params.pid) || StringUtils.isBlank(params.sellerId) || StringUtils.isBlank(params.shopName)) throw BizException(
             CommonEnum.PARAMS_ERROR
@@ -156,6 +164,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      *
      * @return json字符串
      */
+    @get:Cacheable(RedisKeys.DTK_SERVICE + "searchWorlds#1")
     override val searchWorlds: String
         get() {
             val url = "https://openapi.dataoke.com/api/category/get-top100"
@@ -167,6 +176,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      *
      * @return json
      */
+    @get:Cacheable(RedisKeys.DTK_SERVICE + "videoCategory#1")
     override val videoCategory: String
         get() {
             val url = "https://openapi.dataoke.com/api/delanys/media/video/get-category-list"
@@ -179,6 +189,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param paramsModel 参数
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"getVideoGoodsList#1", key = "#paramsModel")
     override fun getVideoGoodsList(paramsModel: VideoGoodsParamsModel): String {
         if (StringUtils.isBlank(paramsModel.cid) || StringUtils.isBlank(paramsModel.pageId) || StringUtils.isBlank(
                 paramsModel.pageSize
@@ -194,6 +205,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param paramsModel 参数
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"getSubdivisionIdGoodsList#2", key = "#paramsModel")
     override fun getSubdivisionIdGoodsList(paramsModel: SubdivisionParamsModel): String {
         if (StringUtils.isBlank(paramsModel.subdivisionId)) throw BizException(CommonEnum.PARAMS_ERROR)
         val url = "https://openapi.dataoke.com/api/subdivision/get-rank-list"
@@ -213,6 +225,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param paramsModel 参数
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"getDiscountGoodsList#2",key = "#paramsModel")
     override fun getDiscountGoodsList(paramsModel: DiscountParamsModel): String {
         if (StringUtils.isBlank(paramsModel.pageId) || StringUtils.isBlank(paramsModel.pageSize) || StringUtils.isBlank(
                 paramsModel.sort
@@ -228,6 +241,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param paramsModel 参数
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"getHalfDayGoodsList#2", key = "#paramsModel")
     override fun getHalfDayGoodsList(paramsModel: HalfDayParamsModel): String {
         val url = "https://openapi.dataoke.com/api/goods/get-half-price-day"
         return dtkApiService.request(url, paramsModel.toMapParams(), DTKApiConstant.HALF_DAY_VERSION)
@@ -239,6 +253,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param paramsModel 参数
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"getGoodsHistory#2", key = "#paramsModel")
     override fun getGoodsHistory(paramsModel: GoodsHistoryParamsModel): String {
         if (StringUtils.isBlank(paramsModel.id) && StringUtils.isBlank(paramsModel.goodsId)) throw BizException(
             CommonEnum.PARAMS_ERROR
@@ -253,6 +268,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param paramsModel 参数
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"getLiveDatas#2", key = "#paramsModel")
     override fun getLiveDatas(paramsModel: LiveParamsModel): String {
         val url = "https://openapi.dataoke.com/api/goods/liveMaterial-goods-list"
         return dtkApiService.request(url, paramsModel.toMapParams(), DTKApiConstant.LIVE_VERSION)
@@ -264,6 +280,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param paramsModel 参数
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"getHotDayGoodsList#2", key = "#paramsModel")
     override fun getHotDayGoodsList(paramsModel: HotDayParamsModel): String {
         if (StringUtils.isBlank(paramsModel.pageId) || StringUtils.isBlank(paramsModel.pageSize)) throw BizException(
             CommonEnum.PARAMS_ERROR
@@ -278,6 +295,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param paramsModel 参数
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"getNineNineGoodsList#2", key = "#paramsModel")
     override fun getNineNineGoodsList(paramsModel: NineNineParamsModel): String {
         if (StringUtils.isBlank(paramsModel.nineCid) || StringUtils.isBlank(paramsModel.pageId) || StringUtils.isBlank(
                 paramsModel.pageSize
@@ -293,6 +311,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param paramsModel 参数
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"getDddGoodsList#2", key = "#paramsModel")
     override fun getDddGoodsList(paramsModel: DdqParamsModel): String {
         val url = "https://openapi.dataoke.com/api/category/ddq-goods-list"
         return dtkApiService.request(url, paramsModel.toMapParams(), DTKApiConstant.DDQ_VERSION)
@@ -304,6 +323,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param paramsModel 参数
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"getExclusiveGoodsList#2", key = "#paramsModel")
     override fun getExclusiveGoodsList(paramsModel: ExclusiveParamsModel): String {
         if (StringUtils.isBlank(paramsModel.pageId) || StringUtils.isBlank(paramsModel.pageSize)) throw BizException(
             CommonEnum.PARAMS_ERROR
@@ -318,6 +338,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param paramsModel 参数
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"getTopGoodsList#2", key = "#paramsModel")
     override fun getTopGoodsList(paramsModel: TopParamsModel): String {
         val url = "https://openapi.dataoke.com/api/goods/get-ranking-list"
         return dtkApiService.request(url, paramsModel.toMapParams(), DTKApiConstant.TOP_VERSION)
@@ -329,8 +350,9 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param paramsModel 参数
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"getWechatList#2", key = "#paramsModel")
     override fun getWechatList(paramsModel: WeChatParamsModel): String {
-        if (StringUtils.isBlank(paramsModel.pageId)) throw BizException(CommonEnum.PARAMS_ERROR,"缺少pageId")
+        if (StringUtils.isBlank(paramsModel.pageId)) throw BizException(CommonEnum.PARAMS_ERROR, "缺少pageId")
         val url = "https://openapi.dataoke.com/api/goods/friends-circle-list"
         return dtkApiService.request(url, paramsModel.toMapParams(), DTKApiConstant.WECHAT_VERSION)
     }
@@ -340,6 +362,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      *
      * @return json
      */
+    @get:Cacheable(RedisKeys.DTK_SERVICE + "topicList#2")
     override val topicList: String
         get() {
             val url = "https://openapi.dataoke.com/api/goods/topic/catalogue"
@@ -353,6 +376,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param paramsModel 参数
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"getSimilarList#2", key = "#paramsModel")
     override fun getSimilarList(paramsModel: SimilarParamsModel): String {
         if (StringUtils.isBlank(paramsModel.id)) throw BizException(CommonEnum.PARAMS_ERROR)
         val url = "https://openapi.dataoke.com/api/goods/list-similer-goods-by-open"
@@ -364,6 +388,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      *
      * @return json
      */
+    @get:Cacheable(RedisKeys.DTK_SERVICE + "activity#2")
     override val activity: String
         get() {
             val url = "https://openapi.dataoke.com/api/goods/activity/catalogue"
@@ -376,6 +401,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param paramsModel 参数
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"getActivityGoods#2", key = "#paramsModel")
     override fun getActivityGoods(paramsModel: ActivityGoodsParamsModel): String {
         if (StringUtils.isBlank(paramsModel.activityId)) throw BizException(CommonEnum.PARAMS_ERROR)
         val url = "https://openapi.dataoke.com/api/goods/activity/goods-list"
@@ -388,6 +414,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param paramsModel 参数
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"getDetail#2", key = "#paramsModel")
     override fun getDetail(paramsModel: DetailParamsModel): String {
         if (StringUtils.isBlank(paramsModel.goodsId) && StringUtils.isBlank(paramsModel.id)) throw BizException(
             CommonEnum.PARAMS_ERROR
@@ -402,6 +429,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param paramsModel 参数
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"getTklConvertTkl#2", key = "#paramsModel")
     override fun getTklConvertTkl(paramsModel: TklConvertTklParamsModel): String {
         if (StringUtils.isBlank(paramsModel.content)) throw BizException(CommonEnum.PARAMS_ERROR)
         val url = "https://openapi.dataoke.com/api/tb-service/twd-to-twd"
@@ -414,6 +442,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param params 参数
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"createTkl#2", key = "#params")
     override fun createTkl(params: CreateTklParams): String {
         val url = "https://openapi.dataoke.com/api/tb-service/creat-taokouling"
         if (StringUtils.isBlank(params.text) || StringUtils.isBlank(params.url)) {
@@ -428,6 +457,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param params 参数
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"getPrivilegeLink#2", key = "#params")
     override fun getPrivilegeLink(params: PrivilegeLinkParams): String {
         if (StringUtils.isBlank(params.goodsId)) throw BizException(CommonEnum.PARAMS_ERROR)
         val url = "https://openapi.dataoke.com/api/tb-service/get-privilege-link"
@@ -440,6 +470,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param param 参数
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"getTaobaoPriceProducts#2", key = "#param")
     override fun getTaobaoOnePriceProducts(param: TaobaoOnePriceProductsParam): String {
         val url = "https://openapi.dataoke.com/api/category/get-tb-topic-list"
         ParamUtil.verifyParam(param.pageId)
@@ -452,6 +483,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param param 参数
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"superSearch#2", key = "#param")
     override fun superSearch(param: LianmengSearchParam): String {
         val url = "https://openapi.dataoke.com/api/goods/list-super-goods"
         ParamUtil.verifyParam(param.pageId, param.pageSize, param.type, param.keyWords)
@@ -464,6 +496,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param param 参数
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"getSpeiderProduct#2", key = "#param")
     override fun getSpeiderProduct(param: SpeiderProductParam): String {
         val url = "https://openapi.dataoke.com/api/dels/spider/list-tip-off"
         return dtkApiService.request(url, param.toMapParams(), "v2.0.0")
@@ -480,6 +513,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      *
      * @return json
      */
+    @get:Cacheable(RedisKeys.DTK_SERVICE + "getHotSearchWorlds#2")
     override val hotSearchWorlds: String
         get() {
             val url = "https://openapi.dataoke.com/api/etc/search/list-hot-words"
@@ -492,6 +526,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param param 参数
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"getProductMaterial#2", key = "#param")
     override fun getProductMaterial(param: ProductMaterialParam): String {
         val url = "https://openapi.dataoke.com/api/goods/material/list"
         ParamUtil.verifyParam(param.id)
@@ -504,6 +539,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param param 参数
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"getHighCommission#2", key = "#param")
     override fun getHighCommission(param: HighCommissionParam): String {
         val url = "https://openapi.dataoke.com/api/goods/singlePage/list-height-commission"
         ParamUtil.verifyParam(param.pageId, param.pageSize)
@@ -516,6 +552,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param param 参数
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"getSubCategory#2", key = "#param")
     override fun getSubCategory(param: SubCategoryParam): String {
         val url = "https://openapi.dataoke.com/api/subdivision/get-list"
         ParamUtil.verifyParam(param.cid, param.pageSize, param.pageId)
@@ -528,6 +565,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param param 参数
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"getActivityProducts#2", key = "#param")
     override fun getActivityProducts(param: ActivityParam?): String {
         val url = "https://openapi.dataoke.com/api/tb-service/activity-link"
         return dtkApiService.request(url, param.toMapParams(), "v1.0.0")
@@ -539,6 +577,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param promotionUnionConvert 参数
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"jdGetPromotionUnionConvert#2", key = "#promotionUnionConvert")
     override fun jdGetPromotionUnionConvert(promotionUnionConvert: JDPromotionUnionConvert?): String {
         val url = "https://openapi.dataoke.com/api/dels/jd/kit/content/promotion-union-convert"
         return dtkApiService.request(url, promotionUnionConvert.toMapParams(), "v1.0.0")
@@ -550,9 +589,10 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param url 链接
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"jdParseUrl#2", key = "#url")
     override fun jdParseUrl(url: String): String {
         val apiUrl = "https://openapi.dataoke.com/api/dels/jd/kit/parseUrl"
-        val initParamMap = mutableMapOf<String,Any>()
+        val initParamMap = mutableMapOf<String, Any>()
         initParamMap["url"] = url
         return dtkApiService.request(apiUrl, initParamMap, "v1.0.0")
     }
@@ -563,6 +603,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param params 参数
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"jdPromotionUnionConvertWithOne#2", key = "#params")
     override fun jdPromotionUnionConvertWithOne(params: JDPromotionUnionConvertWithOneParams?): String {
         val url = "https://openapi.dataoke.com/api/dels/jd/kit/promotion-union-convert"
         return dtkApiService.request(url, params.toMapParams(), "v1.0.0")
@@ -574,6 +615,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param param 参数
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"pddGoodsPromGenerate#2", key = "#param")
     override fun pddGoodsPromGenerate(param: PDDGoodsPromGenerateParam?): String {
         val url = "https://openapi.dataoke.com/api/dels/pdd/kit/goods-prom-generate"
         return dtkApiService.request(url, param.toMapParams(), "v1.0.0")
@@ -585,16 +627,21 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param param 参数
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"getOrderDetails#5#s", key = "#param")
     override fun getOrderDetails(param: OrderDetailParam): String {
         val url = "https://openapi.dataoke.com/api/tb-service/get-order-details"
-        val string =  dtkApiService.request(url, param.toMapParams(), "v1.0.0")
+        val string = dtkApiService.request(url, param.toMapParams(), "v1.0.0")
 
         //进行判断
         val json = JSONObject.parse(string)
-        if(json.getIntValue("code") == 0){
+        if (json.getIntValue("code") == 0) {
             val tbJson = json.getJSONObject("data")
-            if(tbJson.containsKey("msg") && tbJson.getString("msg")!="ok"){
-                throw BizException(errorMsg = tbJson.getString("sub_msg"), data =  tbJson, toastType = ResultDialogType.Dialog)
+            if (tbJson.containsKey("msg") && tbJson.getString("msg") != "ok") {
+                throw BizException(
+                    errorMsg = tbJson.getString("sub_msg"),
+                    data = tbJson,
+                    toastType = ResultDialogType.Dialog
+                )
             }
         }
         return string
@@ -606,9 +653,10 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param content 解析文本
      * @return 结果
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"getTbParseContent#2", key = "#content")
     override fun getTbParseContent(content: String): String {
         val url = "https://openapi.dataoke.com/api/tb-service/parse-content"
-        val initParamMap = mutableMapOf<String,Any>()
+        val initParamMap = mutableMapOf<String, Any>()
         initParamMap["content"] = content
         return dtkApiService.request(url, initParamMap, "v1.0.0")
     }
@@ -619,9 +667,10 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param content 解析文本
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"getTbParseTaokouling#2", key = "#content")
     override fun getTbParseTaokouling(content: String): String {
         val url = "https://openapi.dataoke.com/api/tb-service/parse-taokouling"
-        val initParamMap = mutableMapOf<String,Any>()
+        val initParamMap = mutableMapOf<String, Any>()
         initParamMap["content"] = content
         return dtkApiService.request(url, initParamMap, "v1.0.0")
     }
@@ -632,6 +681,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param param 参数
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"getJdOfficiaOrderList#2", key = "#param", unless = "param==null")
     override fun getJdOfficiaOrderList(param: GetOfficialOrderListParam?): String {
         val url = "https://openapi.dataoke.com/api/dels/jd/order/get-official-order-list"
         return dtkApiService.request(url, param.toMapParams(), "v1.0.0")
@@ -643,9 +693,10 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param content 二合一链接，淘口令，或同时输入商品+优惠券链接
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"getTbCouponInfo#2", key = "#content")
     override fun getTbCouponInfo(content: String): String {
         val url = "https://openapi.dataoke.com/api/dels/taobao/kit/coupon/get-coupon-info"
-        val initParamMap = mutableMapOf<String,Any>()
+        val initParamMap = mutableMapOf<String, Any>()
         initParamMap["content"] = content
         return dtkApiService.request(url, initParamMap, "v1.0.0")
     }
@@ -656,6 +707,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param param 参数
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"getTbCzmf#2", key = "#param")
     override fun getTbCzmf(param: CzmfParam?): String {
         val url = "https://openapi.dataoke.com/api/dels/taobao/kit/turnLink/czmf"
         return dtkApiService.request(url, param.toMapParams(), "v1.0.0")
@@ -667,6 +719,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param param 参数
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"pddSearch#2", key = "#param")
     override fun pddSearch(param: PddSearchParam?): String {
         val url = "https://openapi.dataoke.com/api/dels/pdd/goods/search"
         val treeMap = JSONObject.parseObject(JSONObject.toJSONString(param), TreeMap::class.java)
@@ -679,6 +732,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param param 入参
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"tljCreate#2", key = "#param")
     override fun tljCreate(param: TaolijinCreateParam?): String {
         val url = "https://openapi.dataoke.com/api/dels/taobao/kit/create-tlj"
 
@@ -692,6 +746,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param param 入参
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"tljProducts#2", key = "#param")
     override fun tljProducts(param: TaolijinProductsParam?): String {
         val url = "https://openapi.dataoke.com/api/goods/first-order-gift-money"
         val treeMap = JSONObject.parseObject(JSONObject.toJSONString(param), TreeMap::class.java)
@@ -706,9 +761,10 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param sort     排序 0-综合排序；1-价格升序；2-价格降序
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"jdNinesList#2", key = "#pageId+'_'+#pageSize+'_'+#sort")
     override fun jdNinesList(pageId: Int, pageSize: Int, sort: Int): String {
         val url = "https://openapi.dataoke.com/api/dels/jd/column/list-nines"
-        val initParamMap = mutableMapOf<String,Any>()
+        val initParamMap = mutableMapOf<String, Any>()
         initParamMap["pageId"] = pageId.toString()
         initParamMap["pageSize"] = pageSize.toString()
         initParamMap["sort"] = sort.toString()
@@ -721,9 +777,10 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param sku sku
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"jdProductDetail#2", key = "#sku")
     override fun jdProductDetail(sku: String): String {
         val url = "https://openapi.dataoke.com/api/dels/jd/goods/get-details"
-        val initParamMap = mutableMapOf<String,Any>()
+        val initParamMap = mutableMapOf<String, Any>()
         initParamMap["skuIds"] = sku
         return dtkApiService.request(url, initParamMap, "v1.0.0")
     }
@@ -735,9 +792,10 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param pageSize 每页多少条数据
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"jdPhb#2", key = "#page+'_'+#pageSize")
     override fun jdPhb(page: Int, pageSize: Int): String {
         val url = "https://openapi.dataoke.com/api/dels/jd/column/list-real-ranks"
-        val initParamMap = mutableMapOf<String,Any>()
+        val initParamMap = mutableMapOf<String, Any>()
         initParamMap["pageId"] = page.toString()
         initParamMap["pageSize"] = pageSize.toString()
         return dtkApiService.request(url, initParamMap, "v1.0.0")
@@ -750,9 +808,10 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param pageSize 每页多少条数据
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"jdDpzk#2", key = "#page+'_'+#pageSize")
     override fun jdDpzk(page: Int, pageSize: Int): String {
         val url = "https://openapi.dataoke.com/api/dels/jd/column/list-discount-brand"
-        val initParamMap = mutableMapOf<String,Any>()
+        val initParamMap = mutableMapOf<String, Any>()
         initParamMap["pageId"] = page.toString()
         initParamMap["pageSize"] = pageSize.toString()
         return dtkApiService.request(url, initParamMap, "v1.0.0")
@@ -764,9 +823,10 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param parentId 父亲分类id , 一级分类设置成0
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"getPddCategory#2", key = "#parentId")
     override fun getPddCategory(parentId: String): String {
         val url = "https://openapi.dataoke.com/api/dels/pdd/category/search"
-        val initParamMap = mutableMapOf<String,Any>()
+        val initParamMap = mutableMapOf<String, Any>()
         initParamMap["parentId"] = parentId
         return dtkApiService.request(url, initParamMap, "v1.0.0")
     }
@@ -777,6 +837,7 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param jsonObject 参数
      * @return json
      */
+    @Cacheable(RedisKeys.DTK_SERVICE+"getJdCategory#2", key = "#jsonObject", unless = "jsonObject==null")
     override fun getJdCategory(jsonObject: JdCategoryParam?): String {
         val url = "https://openapi.dataoke.com/api/dels/jd/category/search"
         val treeMap = JSONObject.parseObject(JSONObject.toJSONString(jsonObject), TreeMap::class.java)
@@ -789,6 +850,8 @@ class DTKRequestServiceImpl : DTKReqeestService {
      * @param params 请求参数
      * @return json
      */
+
+    @Cacheable(RedisKeys.DTK_SERVICE+"jdSearch#2", key = "#params")
     override fun jdSearch(params: MutableMap<String, Any>): String {
         val url = "https://openapi.dataoke.com/api/dels/jd/goods/search"
         return dtkApiService.request(url, params, "v1.0.0")
