@@ -87,7 +87,7 @@ class Result<T> : Serializable {
     val success get() = state == HttpStatus.OK.value()
 
 
-    @Schema(description = "重定向URL,不为null需要跳转到这个链接", example = "/error?message=token失效&reDirectTo=/orderList")
+    @Schema(description = "重定向URL,不为null需要跳转到这个链接", example = "/error?message=token失效&reDirectTo=/orderList",required = false)
     var redirectUrl: String? = null
 
     constructor() {

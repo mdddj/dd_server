@@ -13,4 +13,6 @@ class ZheConfigService : ConfigBase<ZheConfigModel>(ZheConfigModel::class) {
     fun getRequestParam() : HashMap<String,Any> {
         return hashMapOf("apiKey" to setting.appKey)
     }
+
+
 }
