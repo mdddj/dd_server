@@ -195,7 +195,10 @@ class PublicApiController {
     @GetMapping("/friends")
     @Operation(summary = "获取友链")
     fun findAll(friendLink: FriendLink?): Result<List<FriendLink>> {
-        return Result.ok(friendLinkService.findAllBy(friendLink))
+        if(friendLink == null){
+            return friendLinkService.findAll().successResult()
+        }
+        return  Result.ok(friendLinkService.findAllBy(friendLink))
     }
 
 

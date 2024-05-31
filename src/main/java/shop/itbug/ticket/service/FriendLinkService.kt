@@ -12,7 +12,13 @@ interface FriendLinkService {
      * @param friendLink 条件
      * @return 列表
      */
-    fun findAllBy(friendLink: FriendLink?): List<FriendLink>
+    fun findAllBy(friendLink: FriendLink): List<FriendLink>
+
+
+    /**
+     * 查找全部
+     */
+    fun findAll() : List<FriendLink>
 
     /**
      * 创建或者修改一个友链
