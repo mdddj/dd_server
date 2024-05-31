@@ -84,7 +84,7 @@ class MyResourceControllerWithApp {
 
     @PostMapping("/new")
     @Operation(summary = "创建动态")
-    @Transactional()
+    @Transactional
     fun createOneResource(
         params: CreateOneResourceParams,
         @GetLoginUser user: User,
@@ -106,7 +106,7 @@ class MyResourceControllerWithApp {
                 try {
                     resource.share = JSONObject.parseObject(params.share!!,Share::class.java)
                 }catch (e:Exception){
-                    throw BizException(e)
+                    throw BizException("分享失败")
                 }
             }
 
@@ -120,7 +120,6 @@ class MyResourceControllerWithApp {
                 resource.mianji = mianjiService.findById(params.mianjiId)
             }
             val saveOrUpdate1 = myResourceService.saveOrUpdate(resource)
-
 
             return saveOrUpdate1.successResult()
         }catch (e:Exception){

@@ -15,7 +15,7 @@
     "@ant-design/icons": "^5.3.7",
     "@ant-design/pro-components": "^2.7.9",
     "@nextui-org/react": "^2.4.0",
-    "@umijs/max": "^4.2.6",
+    "@umijs/max": "^4.2.8",
     "@wcj/markdown-to-html": "^3.0.2",
     "antd": "^5.17.4",
     "axios": "^1.7.2",

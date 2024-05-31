@@ -13,6 +13,7 @@ import shop.itbug.ticket.ex.log
 import shop.itbug.ticket.exception.BizException
 import shop.itbug.ticket.service.FriendLinkService
 import shop.itbug.ticket.utils.Result
+import shop.itbug.ticket.utils.successResult
 import shop.itbug.ticket.utils.verify
 
 /**
@@ -34,6 +35,7 @@ class FriendLinkController {
     @GetMapping("/list")
     @Operation(summary = "获取全部友链", description = "支持过滤查询")
     fun findAll(friendLink: FriendLink?): Result<List<FriendLink>> {
+        if(friendLink==null) return friendLinkService.findAll().successResult()
         return Result.ok(friendLinkService.findAllBy(friendLink))
     }
 

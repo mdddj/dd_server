@@ -9,5 +9,6 @@ class RedisKeys {
         const val TEXT: String = "text_model__"
         const val DTK: String = "dtk_"
         const val TAG: String = "tag_"
+        const val PROJECT: String = "project_"
     }
 }

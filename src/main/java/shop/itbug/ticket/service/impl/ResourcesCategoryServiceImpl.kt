@@ -38,10 +38,7 @@ class ResourcesCategoryServiceImpl : ResourcesCategoryService {
     }
 
     override fun findByName(name: String,type: String): ResourcesCategory {
-        return resourcesCategoryDao.findByName(name)
-            ?: return resourcesCategoryDao.save(ResourcesCategory().apply {
-                this.name = name
-                this.type = type })
+        return resourcesCategoryDao.findByName(name) ?: throw BizException(CommonEnum.NOT_FOUND)
     }
 
     override fun deleteList(ids: List<Long>) {

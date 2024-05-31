@@ -129,7 +129,6 @@ interface ResourcesCategoryService {
 
     /**
      * 根据名字来获取分组对象
-     * 注意: 如果没找到会立即新建一个分组
      */
     fun findByName(name: String, type: String = ""): ResourcesCategory
 
