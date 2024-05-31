@@ -12,7 +12,6 @@ import org.springframework.data.domain.Page
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
-import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest
 import shop.itbug.ticket.admin.model.PageModel
 import shop.itbug.ticket.annotation.GetLoginUser
 import shop.itbug.ticket.controller.getCurrentHost
@@ -61,10 +60,8 @@ class MyResourceController {
     fun list(pageModel: PageModel, resources: MyResources?, categoryId: Long?): Result<Page<MyResources>> {
         if (categoryId != null) {
             val byId = resourcesCategoryService.findById(categoryId)
-            if (byId != null) {
-                if (resources != null) {
-                    resources.category = byId
-                }
+            if (resources != null) {
+                resources.category = byId
             }
         }
         val all = myResourceService.findAll(pageModel, resources)

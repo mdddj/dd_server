@@ -11,5 +11,5 @@ module.exports = {
   plugins: [nextui({
     themes: {},
     prefix: "dd"
-  })],
+  }),require('daisyui')],
 }

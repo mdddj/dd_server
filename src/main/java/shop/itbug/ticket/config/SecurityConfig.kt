@@ -7,14 +7,13 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.annotation.Order
 import org.springframework.security.authentication.ProviderManager
-import org.springframework.security.config.Customizer
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
-import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.factory.PasswordEncoderFactories
 import org.springframework.security.crypto.password.*
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import org.springframework.web.cors.CorsConfiguration
 import shop.itbug.ticket.auth.account.AccountLoginAuthenticationFilter
 import shop.itbug.ticket.auth.account.AccountLoginAuthenticationProvider
 import shop.itbug.ticket.auth.email.EmailLoginAuthenticationFailure
@@ -25,7 +24,6 @@ import shop.itbug.ticket.filter.JwtTokenBeforeFilter
 import shop.itbug.ticket.filter.RestAuthenticationEntryPoint
 import shop.itbug.ticket.filter.SecurityNoAccessResultFilter
 import shop.itbug.ticket.service.UserService
-import shop.itbug.ticket.service.impl.SpringSecurityUserDetailsService
 
 
 @Configuration
@@ -33,9 +31,6 @@ open class SecurityConfig {
 
 
     val log: Logger = LoggerFactory.getLogger(SecurityConfig::class.java)
-
-    @Resource
-    private lateinit var springSecurityUserDetailsService: SpringSecurityUserDetailsService
 
     @Resource
     private lateinit var securityNoAccessResultFilter: SecurityNoAccessResultFilter
@@ -75,12 +70,23 @@ open class SecurityConfig {
     @Order(1)
     @Throws(Exception::class)
     open fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
-        http.anonymous {}
-            .cors(Customizer.withDefaults()).csrf(Customizer.withDefaults())
-            .sessionManagement {
-                it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+
+        http
+            .httpBasic {
             }
-            .addFilterBefore(
+            .cors {
+                it.configurationSource {
+                    CorsConfiguration().apply {
+                        allowedOrigins = arrayListOf("*")
+                        allowedMethods = arrayListOf("*")
+                        allowedHeaders = arrayListOf("*")
+                    }
+                }
+            }.csrf {
+                it.disable()
+            }.sessionManagement {
+                it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            }.addFilterBefore(
                 JwtTokenBeforeFilter(userService),
                 UsernamePasswordAuthenticationFilter::class.java
             )
@@ -93,46 +99,14 @@ open class SecurityConfig {
                 it.requestMatchers("/api/v1/dtk/detail/**").hasAuthority("admin")
                 it.requestMatchers("/api/role/**").hasAuthority("admin")
                 it.requestMatchers(*getPermitUrls().toTypedArray()).permitAll().anyRequest().authenticated()
-
             }
-            .httpBasic(Customizer.withDefaults())
             .exceptionHandling {
                 it.accessDeniedHandler(securityNoAccessResultFilter)
                 it.authenticationEntryPoint(restAuthenticationEntryPoint)
             }
-
-
-//        http.anonymous {
-//        }
-//            .cors {
-//                it.disable()
-//            }.csrf{
-//                it.disable()
-//            }.sessionManagement {
-//                it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//            }.authorizeHttpRequests {
-//                it.requestMatchers("/api/v1/dtk/detail/**").hasAuthority("admin")
-//                it.requestMatchers("/api/role/**").hasAuthority("admin")
-//                it.requestMatchers(*getPermitUrls().toTypedArray()).permitAll()
-//                it.anyRequest().authenticated()
-//            }.addFilterBefore(JwtTokenBeforeFilter(userService), UsernamePasswordAuthenticationFilter::class.java)
-//            .addFilterBefore(emailLoginAuthenticationFilter(), UsernamePasswordAuthenticationFilter::class.java)
-//            .addFilterBefore(accountLoginAuthenticationFilter(), UsernamePasswordAuthenticationFilter::class.java)
-//            .exceptionHandling {
-//                it.accessDeniedHandler(securityNoAccessResultFilter)
-//                it.authenticationEntryPoint(restAuthenticationEntryPoint)
-//            }
-//            .httpBasic(Customizer.withDefaults())
-
         return http.build()
 
     }
-
-    @Bean
-    open fun userDetailsService(): UserDetailsService {
-        return springSecurityUserDetailsService
-    }
-
 
     @Bean
     open fun passwordEncoder(): PasswordEncoder {
