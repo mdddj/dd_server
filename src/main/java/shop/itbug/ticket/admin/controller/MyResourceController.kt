@@ -19,8 +19,10 @@ import shop.itbug.ticket.entry.FileInfo
 import shop.itbug.ticket.entry.FileInfoSaveConfig
 import shop.itbug.ticket.entry.MyResources
 import shop.itbug.ticket.entry.User
-import shop.itbug.ticket.ex.log
+import shop.itbug.ticket.entry.useagent.MyUseAgent
+import shop.itbug.ticket.entry.useagent.myUseAgent
 import shop.itbug.ticket.exception.BizException
+import shop.itbug.ticket.exception.CommonEnum
 import shop.itbug.ticket.model.params.AddPostParamsModel
 import shop.itbug.ticket.model.params.IdBody
 import shop.itbug.ticket.service.FileInfoService
@@ -94,7 +96,6 @@ class MyResourceController {
         val config = FileInfoSaveConfig(user,request.getCurrentHost(), resourcesCategory.name ?: "postImage",false)
         val files =
             fileInfoService.saveAllFiles(pictures, config).toHashSet()
-        log().info("upload success files result:${files}")
         val post = paramsModel.id?.let { myResourceService.findById(it) } ?: MyResources()
         post.content = paramsModel.content
         post.createDate = paramsModel.createDate ?: DateUtil.date()
@@ -111,6 +112,7 @@ class MyResourceController {
         post.links = paramsModel.links
         post.browserUrl = paramsModel.browserUrl
         post.updateDate = paramsModel.updateDate ?: DateUtil.date()
+        post.useAgent = request.myUseAgent()
         paramsModel.mianji?.let {
             post.mianji = mianjiService.save(it)
         }
@@ -125,7 +127,7 @@ class MyResourceController {
      */
     @DeleteMapping("/delete")
     @Operation(summary = "删除资源")
-    fun delete(idBody: IdBody, @GetLoginUser user: User): Result<String> {
+    fun delete(idBody: IdBody): Result<String> {
         try {
             myResourceService.deleteMyResource(idBody.id)
             return Result.ok("删除成功！")
@@ -139,5 +141,15 @@ class MyResourceController {
     @Operation(summary = "获取label不为空的全部文章")
     fun findAllLabelPosts(): ResultJSON<*> {
         return myResourceService.finAllWithLabelNotEmpty().successResult()
+    }
+
+    @PostMapping("/setUseAgent")
+    @Operation(summary = "设置动态ua")
+    fun setUseAgent(request: HttpServletRequest, @RequestBody idBody: IdBody): R<MyUseAgent> {
+        val findById = myResourceService.findById(idBody.id) ?: throw BizException(CommonEnum.NOT_FOUND)
+        val ua = request.myUseAgent() ?: throw BizException("获取ua失败")
+        findById.useAgent = ua
+        myResourceService.saveOrUpdate(findById)
+        return ua.successResult("设置成功")
     }
 }

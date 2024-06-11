@@ -24,7 +24,6 @@ class StorageController {
         return R.ok(save)
     }
 
-
     @DeleteMapping("/delete")
     @Operation(summary = "删除一个文件")
     fun remove(id: Long) : ResultJSON<*> {

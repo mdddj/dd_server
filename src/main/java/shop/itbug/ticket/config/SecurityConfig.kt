@@ -82,7 +82,7 @@ open class SecurityConfig {
                         allowedHeaders = arrayListOf("*")
                     }
                 }
-            }.csrf {
+            }.csrf{
                 it.disable()
             }.sessionManagement {
                 it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)

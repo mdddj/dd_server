@@ -105,7 +105,7 @@ class MyResourceControllerWithApp {
             if(!params.share.isNullOrBlank()){
                 try {
                     resource.share = JSONObject.parseObject(params.share!!,Share::class.java)
-                }catch (e:Exception){
+                }catch (_:Exception){
                     throw BizException("分享失败")
                 }
             }
