@@ -1,18 +1,19 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {Card, CardBody, CardHeader, Divider} from '@nextui-org/react';
 import useOsWebSocket, {MemoryInfo} from '@/models/useOsWebSocket';
-import {useMount} from 'react-use';
 import {Badge, Progress, Spin} from 'antd';
 import {ReadyState} from "react-use-websocket";
 
 const SystemInfoCard: React.FC = () => {
     const {lastJsonMessage, sendMessage, readyText, data, loading, readyState} = useOsWebSocket();
 
-    useMount(() => {
-        setInterval(() => {
-            sendMessage('Memory');
-        }, 2000);
-    });
+    useEffect(()=>{
+        if(readyState == ReadyState.OPEN){
+            setInterval(() => {
+                sendMessage('Memory');
+            }, 2000);
+        }
+    },[readyState]);
 
     let obj = (lastJsonMessage ?? data) as MemoryInfo
 
