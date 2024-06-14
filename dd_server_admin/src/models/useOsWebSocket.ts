@@ -1,7 +1,7 @@
 import useWebSocket, { ReadyState } from 'react-use-websocket';
 import { WS_URL } from '@/constants';
 import { getJwtToken } from '@/utils/cache';
-import { request, useRequest } from '@umijs/max';
+import { request, useModel, useRequest } from '@umijs/max';
 import { Result } from '@/types/result';
 
 async function getMemoryInfo(): Promise<Result<MemoryInfo>> {
@@ -21,6 +21,13 @@ export interface MemoryInfo {
 }
 
 const useOsWebSocket = () => {
+
+
+  const {user} = useModel("@@initialState")
+  console.log(user)
+  if(!user){
+    return {}
+  }
   const { data,loading } = useRequest(() => getMemoryInfo());
   const { readyState, sendMessage, lastJsonMessage } = useWebSocket<MemoryInfo>(WS_URL + '/os', {
     heartbeat: {

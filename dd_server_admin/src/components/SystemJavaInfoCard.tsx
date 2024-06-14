@@ -136,7 +136,6 @@ async function getSystemInfo(): Promise<Result<SystemJavaInfo>> {
 
 const SystemJavaInfoCard: React.FC = () => {
   const { data, loading } = useRequest<SystemJavaInfo>(() => getSystemInfo());
-  console.log(data);
   return <Card>
     <CardHeader>
       <h4 className={'font-bold text-lg'}>系统信息</h4>
