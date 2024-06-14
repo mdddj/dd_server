@@ -34,10 +34,10 @@ class JwtTokenBeforeFilter(val userService: UserService) : OncePerRequestFilter(
         }
         if (StringUtils.isNotBlank(token)) { //token不为空,则进行验证信息,否则放行
             val userId = JwtUtil.getUsername(token)
-            if(userId == null){
+            if (userId == null) {
                 //不是有效的token
-                response.result(ResultJSON<String>(CommonEnum.TOKEN_INVALID,token))
-            }else{
+                response.result(ResultJSON<String>(CommonEnum.TOKEN_INVALID, token))
+            } else {
                 try {
                     val user = userService.findByUserId(userId)
                     if (user == null) {
@@ -66,10 +66,12 @@ class JwtTokenBeforeFilter(val userService: UserService) : OncePerRequestFilter(
         } else {
             try {
                 filterChain.doFilter(request, response)
-            }catch (e:InsufficientAuthenticationException){
-              response.result(ResultJSON<String>(CommonEnum.NO_AUTHORIZATION_INVALID,e.localizedMessage))
-            } catch (e:Exception){
-                response.result(ResultJSON<String>(CommonEnum.EXCEPTION,e.localizedMessage))
+            } catch (e: InsufficientAuthenticationException) {
+                response.result(ResultJSON<String>(CommonEnum.NO_AUTHORIZATION_INVALID, e.localizedMessage))
+            } catch (e: AccessDeniedException) {
+                response.result(ResultJSON<String>(CommonEnum.NO_AUTHORIZATION))
+            } catch (e: Exception) {
+                response.result(ResultJSON<String>(CommonEnum.EXCEPTION, e.localizedMessage))
             }
         }
     }

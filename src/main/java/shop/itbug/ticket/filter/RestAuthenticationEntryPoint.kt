@@ -9,6 +9,7 @@ import org.springframework.security.authentication.InsufficientAuthenticationExc
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.stereotype.Component
+import shop.itbug.ticket.ex.log
 import shop.itbug.ticket.utils.Result
 import shop.itbug.ticket.utils.result
 
@@ -23,6 +24,7 @@ class RestAuthenticationEntryPoint : AuthenticationEntryPoint {
         response: HttpServletResponse,
         authException: AuthenticationException
     ) {
+        log().info("rest auth entry point: {}", authException.message)
         if (authException is InsufficientAuthenticationException) {
             response.result(Result.noAuth().apply {
                 data = authException.localizedMessage

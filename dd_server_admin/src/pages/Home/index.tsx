@@ -1,13 +1,13 @@
 import { PageContainer } from '@ant-design/pro-components';
-import { useModel } from '@umijs/max';
 import React from 'react';
-
+import SystemInfoCard from '@/components/system/Info';
+import SystemJavaInfoCard from '@/components/SystemJavaInfoCard';
 const HomePage: React.FC = () => {
-  const { name } = useModel('global');
   return (
     <PageContainer ghost>
-      <div className={'grid  gap-4 grid-cols-1'}>
-      
+      <div className={'grid gap-4 grid-cols-2'}>
+        <SystemInfoCard />
+        <SystemJavaInfoCard/>
       </div>
     </PageContainer>
   );
