@@ -5,6 +5,7 @@ import {
 import { MyResources } from '@/types/resource';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
 import { Button, Image, Popconfirm, Space, message } from 'antd';
+import {request} from "@umijs/max";
 
 export default function Page() {
   return (
@@ -77,6 +78,12 @@ export default function Page() {
             render: (dom, entity, _, action) => {
               return (
                 <Space>
+                    <Button size={'small'} onClick={()=>{
+                        request('/api/resource/setUseAgent',{
+                            method: 'POST',
+                            data: {id: entity.id}
+                        })
+                    }}>设置UA</Button>
                   <Popconfirm
                     title={'确定删除吗?'}
                     onConfirm={async () => {

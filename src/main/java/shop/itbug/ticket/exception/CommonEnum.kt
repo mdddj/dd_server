@@ -23,7 +23,7 @@ enum class CommonEnum(
     ),
     PARAMS_VIOLATION_EXCEPTION(508, "请求参数验证失败"), RESOURCES_REPETITION(504, "数据已存在"), NO_AUTHORIZATION(
         403,
-        "没有权限访问此资源"
+        "没有权限访问"
     ),
     NO_AUTHORIZATION_HEADER(401, "无法获取用户信息"),
     NO_AUTHORIZATION_INVALID(401, "token过期,请重新登录"),

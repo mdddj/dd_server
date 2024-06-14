@@ -3,6 +3,7 @@ package shop.itbug.ticket.entry
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.persistence.*
 import shop.itbug.ticket.entry.share.Share
+import shop.itbug.ticket.entry.useagent.MyUseAgent
 import java.util.*
 
 /**
@@ -123,6 +124,10 @@ open class MyResources  {
     @Schema(description="产品分享")
     @OneToOne(cascade = [CascadeType.ALL])
     open var share: Share? = null
+
+    @Schema(description = "系统平台")
+    @OneToOne(cascade = [CascadeType.ALL])
+    open var useAgent: MyUseAgent? = null
 
 
 }

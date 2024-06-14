@@ -100,10 +100,12 @@ open class SecurityConfig {
                 it.requestMatchers("/api/role/**").hasAuthority("admin")
                 it.requestMatchers(*getPermitUrls().toTypedArray()).permitAll().anyRequest().authenticated()
             }
-            .exceptionHandling {
-                it.accessDeniedHandler(securityNoAccessResultFilter)
-                it.authenticationEntryPoint(restAuthenticationEntryPoint)
-            }
+
+        http.exceptionHandling {
+            it.accessDeniedHandler(securityNoAccessResultFilter)
+            it.authenticationEntryPoint(restAuthenticationEntryPoint)
+        }
+
         return http.build()
 
     }
