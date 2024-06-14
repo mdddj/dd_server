@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 val sbVersion = "3.3.0"
 
 group = "shop.itbug"
-version = "0.1.0"
+version = "0.1.1"
 description = "梁典典的后台服务"
 
 
