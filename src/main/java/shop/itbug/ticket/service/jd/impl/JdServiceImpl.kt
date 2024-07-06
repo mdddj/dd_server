@@ -7,6 +7,4 @@ import shop.itbug.ticket.service.jd.JdService
  * @author eee
  */
 @Service
-class JdServiceImpl : JdService {
-
-}
+class JdServiceImpl : JdService

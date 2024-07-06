@@ -7,6 +7,4 @@ import org.springframework.stereotype.Service
  * @author eee
  */
 @Service
-interface JdService {
-
-}
+interface JdService

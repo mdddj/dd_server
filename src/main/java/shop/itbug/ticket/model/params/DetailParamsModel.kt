@@ -13,6 +13,5 @@ data class DetailParamsModel(
     /**
      * 淘宝商品id，id或goodsId必填其中一个，若均填写，将优先查找当前单品id
      */
-    @Schema(description = "淘宝商品id，id或goodsId必填其中一个，若均填写，将优先查找当前单品id")
-    open var goodsId: String? = null
+    @Schema(description = "淘宝商品id，id或goodsId必填其中一个，若均填写，将优先查找当前单品id") var goodsId: String? = null
 )

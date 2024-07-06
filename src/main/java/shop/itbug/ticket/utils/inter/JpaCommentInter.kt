@@ -1,6 +1,6 @@
 package shop.itbug.ticket.utils.inter
 
-@kotlin.annotation.Retention(AnnotationRetention.RUNTIME)
+@Retention(AnnotationRetention.RUNTIME)
 @Target(
     AnnotationTarget.ANNOTATION_CLASS,
     AnnotationTarget.CLASS,

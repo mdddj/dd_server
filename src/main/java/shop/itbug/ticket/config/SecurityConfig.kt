@@ -27,7 +27,7 @@ import shop.itbug.ticket.service.UserService
 
 
 @Configuration
-open class SecurityConfig {
+class SecurityConfig {
 
 
     val log: Logger = LoggerFactory.getLogger(SecurityConfig::class.java)
@@ -69,7 +69,7 @@ open class SecurityConfig {
     @Bean
     @Order(1)
     @Throws(Exception::class)
-    open fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
+    fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
 
         http
             .httpBasic {
@@ -111,7 +111,7 @@ open class SecurityConfig {
     }
 
     @Bean
-    open fun passwordEncoder(): PasswordEncoder {
+    fun passwordEncoder(): PasswordEncoder {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder()
     }
 
@@ -119,7 +119,7 @@ open class SecurityConfig {
     /**
      * 邮箱认证
      */
-    open fun emailLoginAuthenticationFilter(): EmailLoginAuthenticationFilter {
+    fun emailLoginAuthenticationFilter(): EmailLoginAuthenticationFilter {
         val filter = EmailLoginAuthenticationFilter()
         filter.setAuthenticationManager(ProviderManager(EmailLoginAuthenticationProvider(userService)))
         filter.setAuthenticationFailureHandler(EmailLoginAuthenticationFailure())
@@ -130,7 +130,7 @@ open class SecurityConfig {
     /**
      * 账号认证
      */
-    open fun accountLoginAuthenticationFilter(): AccountLoginAuthenticationFilter {
+    fun accountLoginAuthenticationFilter(): AccountLoginAuthenticationFilter {
         val filter = AccountLoginAuthenticationFilter()
         filter.setAuthenticationManager(ProviderManager(AccountLoginAuthenticationProvider(userService)))
         filter.setAuthenticationFailureHandler(EmailLoginAuthenticationFailure())

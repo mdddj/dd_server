@@ -33,13 +33,13 @@ import kotlin.reflect.jvm.isAccessible
  * @author ldd
  */
 @Configuration
-open class JedisRedisConfig {
+class JedisRedisConfig {
 
     @Resource
     lateinit var redisProperties: RedisProperties
 
     @Bean
-    open fun connectionFactory(): RedisConnectionFactory {
+    fun connectionFactory(): RedisConnectionFactory {
         val redisConf = RedisStandaloneConfiguration()
         redisConf.hostName = redisProperties.host
         redisConf.port = redisProperties.port
@@ -49,7 +49,7 @@ open class JedisRedisConfig {
     }
 
     @Bean
-    open fun cacheManager(connectionFactory: RedisConnectionFactory): RedisCacheManager {
+    fun cacheManager(connectionFactory: RedisConnectionFactory): RedisCacheManager {
         var redisCacheConfiguration =
             RedisCacheConfiguration.defaultCacheConfig()
         redisCacheConfiguration = redisCacheConfiguration.serializeKeysWith(
@@ -73,7 +73,7 @@ open class JedisRedisConfig {
     }
 
     @Bean
-    open fun redisTemplate(factory: RedisConnectionFactory): RedisTemplate<Any, Any> {
+    fun redisTemplate(factory: RedisConnectionFactory): RedisTemplate<Any, Any> {
         val template: RedisTemplate<Any, Any> = RedisTemplate()
         template.connectionFactory = factory
         val myFastJsonRedisSerializer = GenericFastJsonRedisSerializer()

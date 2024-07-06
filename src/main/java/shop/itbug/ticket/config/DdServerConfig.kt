@@ -10,7 +10,7 @@ import java.io.File
 
 @ConfigurationProperties(prefix = "dd-server-config")
 @Configuration
-open class DdServerConfig {
+class DdServerConfig {
     ///配置根目录
     lateinit var rootDir: String
     private final val userHomeDirectory = File(System.getProperty("user.home"))

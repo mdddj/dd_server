@@ -25,7 +25,6 @@ import shop.itbug.ticket.entry.blog.Blog
 import shop.itbug.ticket.entry.blog.BlogTag
 import shop.itbug.ticket.entry.blog.Category
 import shop.itbug.ticket.entry.blog.Text
-import shop.itbug.ticket.entry.storage.StorageServiceImpl
 import shop.itbug.ticket.exception.BizException
 import shop.itbug.ticket.exception.CommonEnum
 import shop.itbug.ticket.model.blog.PushNewBlogParams
@@ -52,7 +51,7 @@ import java.util.function.Consumer
 @RestController
 @RequestMapping("/api/auth")
 @Tag(name = "管理员超级接口")
-open class AdminAuthController {
+class AdminAuthController {
     @Resource
     lateinit var categoryService: CategoryService
 

@@ -11,11 +11,11 @@ import shop.itbug.ticket.model.SystemInfo
 
 @ServerEndpoint("/os")
 @Component
-open class OsSocket {
+class OsSocket {
 
 
     @OnMessage
-    open fun onMessage(session: Session, message: String) {
+    fun onMessage(session: Session, message: String) {
         try {
             when (message) {
                 "Info" -> session.asyncRemote.sendText(SystemInfo.getSystemInfo().toJSONString())

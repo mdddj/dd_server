@@ -27,7 +27,7 @@ import java.util.*
  * @author ldd
  */
 @Configuration
-open class WebConfig : WebMvcConfigurationSupport() {
+class WebConfig : WebMvcConfigurationSupport() {
 
     @Resource
     private lateinit var getUserParameterHandling: GetUserParameterHandling
@@ -58,7 +58,7 @@ open class WebConfig : WebMvcConfigurationSupport() {
 
 
     @Bean
-    open fun createResourceLoader(): ResourceLoader {
+    fun createResourceLoader(): ResourceLoader {
         return DefaultResourceLoader()
     }
 

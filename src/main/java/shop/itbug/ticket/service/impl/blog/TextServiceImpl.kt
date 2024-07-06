@@ -1,5 +1,6 @@
 package shop.itbug.ticket.service.impl.blog
 
+import cn.hutool.core.date.DateUtil
 import jakarta.annotation.Resource
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
@@ -22,6 +23,7 @@ import shop.itbug.ticket.service.redis.RedisKeys
  */
 @Service
 class TextServiceImpl : TextService {
+
     @Resource
     private lateinit var textDao: TextDao
 
@@ -33,6 +35,11 @@ class TextServiceImpl : TextService {
         ]
     )
     override fun save(text: Text): Text {
+        if(text.id == null){
+            text.createDate = DateUtil.date()
+        }else{
+            text.updateDate = DateUtil.date()
+        }
         return textDao.save(text)
     }
 
@@ -53,11 +60,13 @@ class TextServiceImpl : TextService {
         val lastNewVersionNumber = textDao.findByName(name)
         return if (lastNewVersionNumber != null) {
             lastNewVersionNumber.context = value
+            lastNewVersionNumber.updateDate = DateUtil.date()
             save(lastNewVersionNumber)
         } else {
             val text = Text()
             text.name = name
             text.context = value
+            text.createDate = DateUtil.date()
             save(text)
         }
     }

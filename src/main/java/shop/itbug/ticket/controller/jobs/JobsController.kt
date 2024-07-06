@@ -46,7 +46,7 @@ class JobsController {
             this.title = params.title
             this.content = params.content
             this.createDate = DateUtil.date()
-            this.type = cate?.type
+            this.type = cate.type
             this.authority = 4
             this.clickCount = 0
         }).successResult()
@@ -58,7 +58,7 @@ class JobsController {
         val cate = resourcesCategoryService.findById(cateId)
         val findList = myResourcesService.findAll(pageModel,MyResources().apply {
             category = cate
-            type = cate?.type
+            type = cate.type
         })
         return findList.successResult()
     }

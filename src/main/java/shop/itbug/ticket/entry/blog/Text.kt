@@ -7,6 +7,7 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.Lob
 import jakarta.validation.constraints.NotBlank
+import java.util.*
 
 /**
  * @author eee
@@ -60,4 +61,11 @@ open class Text {
     @JsonIgnore
     @Schema(description = "原始查看密码")
     open var originPassword: String? = null
+
+
+    @Schema(description = "创建时间")
+    open var createDate: Date? = null
+
+    @Schema(description = "最后修改时间")
+    open var updateDate: Date? = null
 }
