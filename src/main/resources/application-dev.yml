@@ -30,7 +30,7 @@ spring:
       host: 127.0.0.1
       port: 6379
       timeout: 10000
-      password: 123456
+      password:
       client-type: lettuce
       lettuce:
         pool:
@@ -38,7 +38,7 @@ spring:
           max-idle: 8
           max-active: 8
           max-wait: -1ms
-      url: redis://123456
+      url: redis://
   servlet:
     multipart:
       max-request-size: 6400MB

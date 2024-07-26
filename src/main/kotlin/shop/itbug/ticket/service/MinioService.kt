@@ -6,7 +6,6 @@ import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
-import shop.itbug.ticket.ex.log
 import shop.itbug.ticket.exception.BizException
 import shop.itbug.ticket.service.config.MinioConfig
 import shop.itbug.ticket.service.redis.RedisKeys
@@ -15,6 +14,7 @@ import shop.itbug.ticket.utils.minio.MinioDetailModel
 import shop.itbug.ticket.utils.minio.MinioHandler
 import shop.itbug.ticket.utils.minio.MinioObjectResult
 import java.io.File
+import java.io.InputStream
 
 
 @Service
@@ -46,17 +46,22 @@ class MinioService {
      * @param subFolderName 支持格式 sub, sub/sub, sub/sub/sub
      */
     fun uploadFile(file: MultipartFile, fileName: String, subFolderName: String): MinioObjectResult {
+        return uploadFileWithInputStream(file.inputStream, fileName, subFolderName,file.size)
+    }
+
+    fun uploadFileWithInputStream(inputStream: InputStream, fileName: String, subFolderName: String,size: Long): MinioObjectResult {
         return action { handle, model ->
             return@action handle.uploadStream(
                 model.bucketName,
                 (if (subFolderName.isNotBlank()) subFolderName + File.separator else "") + fileName,
-                file.inputStream,
-                file.size
+                inputStream,
+                size
             )
         }
     }
 
-    /// 太惨了
+
+
     private fun <T> action(doHandle: (handle: MinioHandler, model: MinioDetailModel) -> T): T {
         val minioSetting = minioConfig.setting
         try {

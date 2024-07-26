@@ -5,6 +5,7 @@ import cn.hutool.core.io.FileUtil
 import cn.hutool.core.io.file.FileNameUtil
 import jakarta.annotation.Resource
 import jakarta.servlet.http.HttpServletRequest
+import net.coobird.thumbnailator.Thumbnails
 import org.springframework.data.domain.Example
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -22,6 +23,7 @@ import shop.itbug.ticket.entry.FileInfoSaveConfig
 import shop.itbug.ticket.entry.ResourcesCategory
 import shop.itbug.ticket.entry.User
 import shop.itbug.ticket.entry.storage.StorageServiceImpl
+import shop.itbug.ticket.ex.log
 import shop.itbug.ticket.exception.BizException
 import shop.itbug.ticket.exception.CommonEnum
 import shop.itbug.ticket.exception.ResultDialogType
@@ -30,8 +32,7 @@ import shop.itbug.ticket.service.MinioService
 import shop.itbug.ticket.utils.FileManagerWrapper
 import shop.itbug.ticket.utils.ImageCheck
 import java.awt.Dimension
-import java.io.File
-import java.io.IOException
+import java.io.*
 import javax.imageio.ImageIO
 
 /**
@@ -159,7 +160,7 @@ class FileInfoServiceImpl : FileInfoService {
     }
 
     override fun getLinkUrl(file: MultipartFile, config: FileInfoSaveConfig): FileInfo? {
-        val (user,host,folderName,saveEntity) = config
+        val (user, _, folderName, saveEntity) = config
         if (folderName.isNotBlank() && folderName.startsWith("/")) {
             throw BizException("目录前不能带 / 符号")
         }
@@ -178,22 +179,41 @@ class FileInfoServiceImpl : FileInfoService {
 
         if (ImageCheck.isImage(finalName)) {
             getImageDimensions(file)?.let { size ->
-                {
-                    fileInfo.width = size.width
-                    fileInfo.height = size.height
-                }
+                fileInfo.width = size.width
+                fileInfo.height = size.height
             }
-
         }
 
-        val model = minioService.uploadFile(file, finalName, folderName)
+
+        ///对图片进行压缩
+
+        val inputStream: InputStream
+        val fileSize: Long
+        val outputStream = ByteArrayOutputStream()
+        if (ImageCheck.isImage(finalName)) {
+            Thumbnails.of(file.inputStream).outputQuality(0.8).toOutputStream(outputStream)
+            val bts = outputStream.toByteArray()
+            inputStream = bts.inputStream()
+            fileSize = bts.size.toLong()
+        } else {
+            inputStream = file.inputStream
+            fileSize = file.size
+        }
+
+        val model = minioService.uploadFileWithInputStream(
+            inputStream,
+            finalName,
+            folderName,
+            fileSize
+        )
+        outputStream.close()
 
         fileInfo.url = model.url
         fileInfo.fullUrl = model.fullUrl
         fileInfo.minioObjectName = model.objectName
         fileInfo.minioBucketName = model.bucketName
         fileInfo.user = user
-        if(!saveEntity){
+        if (!saveEntity) {
             return fileInfo
         }
         return fileInfoRepository.save(fileInfo)

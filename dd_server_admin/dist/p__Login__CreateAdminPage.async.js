@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[5010],{76983:function(s,n,u){u.r(n),u.d(n,{default:function(){return l}});var t={title:"title___nYjyy"},e=u(85893);function l(){return(0,e.jsx)("div",{children:(0,e.jsx)("h1",{className:t.title,children:"\u521D\u59CB\u5316\u7BA1\u7406\u5458\u8D26\u53F7"})})}}}]);
