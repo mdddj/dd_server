@@ -228,5 +228,9 @@ export default defineConfig({
   ],
   npmClient: 'pnpm',
   tailwindcss: {},
-  esbuildMinifyIIFE: true
+  title: "典典后台管理",
+  esbuildMinifyIIFE: true,
+  favicons: [
+    "/favicon.ico",
+  ],
 });

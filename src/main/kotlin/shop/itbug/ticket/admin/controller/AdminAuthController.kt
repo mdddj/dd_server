@@ -518,14 +518,9 @@ class AdminAuthController {
         return Result.ok(resourcesCategoryService.findAllLevelTop())
     }
 
-    /**
-     * 文件上传
-     *
-     * @return 结果
-     */
     @PostMapping("/simple-upload")
     @Operation(
-        summary = "文件上传(返回访问链接)", responses = [
+        summary = "管理员文件上传(返回访问链接)", responses = [
             ApiResponse(description = "返回成功示例", responseCode = "200", useReturnTypeSchema = true)
         ]
     )

@@ -17,8 +17,6 @@ class FileManagerWrapper(val file: MultipartFile) {
         return file.originalFilename?.let { file.originalFilename?.substring(it.lastIndexOf(".")) } ?: ".jpg"
     }
 
-
-
     data class FinalNameModel(var name: String,var thumbnailName: String)
     /**
      * 获取最终的名字

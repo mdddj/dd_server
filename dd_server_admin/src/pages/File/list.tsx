@@ -62,7 +62,7 @@ export default function Page() {
           toolBarRender={() => {
             return [
               <Button type="primary" key={'upload'}>
-                上传图片
+                上传文件
               </Button>,
             ];
           }}

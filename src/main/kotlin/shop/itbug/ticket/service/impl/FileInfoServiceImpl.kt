@@ -167,39 +167,36 @@ class FileInfoServiceImpl : FileInfoService {
         val manager = FileManagerWrapper(file)
         val nameModel = manager.getFinalName()
         val finalName = nameModel.name
+        val isImageFile = ImageCheck.isImage(finalName)
         val fileInfo = FileInfo().apply {
             this.fileName = finalName
             this.fileSize = file.size
             this.fileType = FileUtil.extName(finalName)
             this.createDate = DateUtil.date()
             this.ext = FileNameUtil.extName(file.originalFilename)
-            this.isImage = file.originalFilename?.let { ImageCheck.isImage(it) }
+            this.isImage = isImageFile
             originalFilename = file.originalFilename
         }
-
-        if (ImageCheck.isImage(finalName)) {
-            getImageDimensions(file)?.let { size ->
-                fileInfo.width = size.width
-                fileInfo.height = size.height
-            }
-        }
-
-
         ///对图片进行压缩
-
         val inputStream: InputStream
         val fileSize: Long
         val outputStream = ByteArrayOutputStream()
-        if (ImageCheck.isImage(finalName)) {
-            Thumbnails.of(file.inputStream).outputQuality(0.8).toOutputStream(outputStream)
+        if (isImageFile) {
+            val stream = file.inputStream
+            val size = ImageIO.read(stream)
+            Thumbnails.of(stream).outputQuality(0.8)
+                .scale(0.5)
+                .size(size.width,size.height)
+                .toOutputStream(outputStream)
             val bts = outputStream.toByteArray()
             inputStream = bts.inputStream()
             fileSize = bts.size.toLong()
+            fileInfo.width = size.width
+            fileInfo.height = size.height
         } else {
             inputStream = file.inputStream
             fileSize = file.size
         }
-
         val model = minioService.uploadFileWithInputStream(
             inputStream,
             finalName,
@@ -207,6 +204,10 @@ class FileInfoServiceImpl : FileInfoService {
             fileSize
         )
         outputStream.close()
+
+        if (isImageFile){
+            fileInfo.thumbnail = model.fullUrl
+        }
 
         fileInfo.url = model.url
         fileInfo.fullUrl = model.fullUrl
