@@ -25,6 +25,7 @@ import shop.itbug.ticket.entry.blog.Blog
 import shop.itbug.ticket.entry.blog.BlogTag
 import shop.itbug.ticket.entry.blog.Category
 import shop.itbug.ticket.entry.blog.Text
+import shop.itbug.ticket.ex.log
 import shop.itbug.ticket.exception.BizException
 import shop.itbug.ticket.exception.CommonEnum
 import shop.itbug.ticket.model.blog.PushNewBlogParams
@@ -531,6 +532,8 @@ class AdminAuthController {
                 fileInfoService.getLinkUrl(file, config) ?: throw BizException("上传失败")
             Result.ok(linkUrl.url)
         } catch (e: Exception) {
+            log().warn("上传文件失败:${e}")
+            e.printStackTrace()
             throw BizException("上传失败:${e.localizedMessage}")
         }
     }

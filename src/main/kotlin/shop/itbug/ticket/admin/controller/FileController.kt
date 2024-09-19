@@ -18,15 +18,12 @@ import shop.itbug.ticket.entry.FileInfo
 import shop.itbug.ticket.entry.FileInfoSaveConfig
 import shop.itbug.ticket.entry.ResourcesCategory
 import shop.itbug.ticket.entry.User
-import shop.itbug.ticket.entry.storage.StorageServiceImpl
 import shop.itbug.ticket.exception.BizException
 import shop.itbug.ticket.exception.CommonEnum
 import shop.itbug.ticket.service.FileInfoService
 import shop.itbug.ticket.service.ResourcesCategoryService
-import shop.itbug.ticket.utils.BlogUtil
-import shop.itbug.ticket.utils.Result
-import shop.itbug.ticket.utils.ResultJSON
-import shop.itbug.ticket.utils.successResult
+import shop.itbug.ticket.utils.*
+import shop.itbug.ticket.utils.BlogUtil.CoverToPage
 
 /**
  * @author eee
@@ -39,9 +36,6 @@ class FileController {
     @Resource
     private lateinit var resourcesCategoryService: ResourcesCategoryService
 
-    @Resource
-    private lateinit var storageServiceImpl: StorageServiceImpl
-
     @Resource private lateinit var fileInfoService: FileInfoService
 
     /**
@@ -51,10 +45,7 @@ class FileController {
      */
     @PostMapping("/upload")
     @Operation(summary = "上传文件(oss)", deprecated = true)
-    fun uploadWithSimple(@RequestParam("file") file: MultipartFile?,request: HttpServletRequest,@GetLoginUser user: User): Result<*> {
-        if (file == null) {
-            return Result.err("请选择文件")
-        }
+    fun uploadWithSimple(@RequestParam("file") file: MultipartFile,request: HttpServletRequest,@GetLoginUser user: User): Result<FileInfo> {
         val config = FileInfoSaveConfig(user,request.getCurrentHost(),"public")
         val aPublic = fileInfoService.getLinkUrl(file,config)
         return Result.ok(aPublic)
@@ -66,8 +57,8 @@ class FileController {
      */
     @DeleteMapping("/delete")
     @Operation(summary = "删除文件")
-    fun deleteFileInfo(@RequestBody jsonObject: JSONObject): Result<*> {
-        val id = jsonObject.getLong("id") ?: return Result.err("传入删除的ID")
+    fun deleteFileInfo(@RequestBody jsonObject: JSONObject): Result<Boolean> {
+        val id = jsonObject.getLong("id") ?: throw BizException("id is null")
         val b = fileInfoService.tryToDeleteFileinfo(id)
         return Result.ok(b)
     }
@@ -110,12 +101,12 @@ class FileController {
         @RequestParam("id") folderId: Long?,
         @Validated pageModel: PageModel?,
         bindingResult: BindingResult
-    ): Result<*> {
+    ): Result<CoverToPage<FileInfo>> {
         if (bindingResult.hasErrors()) {
-            return Result.paramValidError(bindingResult)
+            bindingResult.verify()
         }
         if (folderId == null) {
-            return Result<Any>(CommonEnum.PARAMS_ERROR)
+            throw BizException(CommonEnum.PARAMS_ERROR)
         }
         val fileInfo = FileInfo()
         val filesByFolder = pageModel?.let { fileInfoService.findFilesByFolder(it, fileInfo) } ?: throw BizException("查找失败")
@@ -125,7 +116,7 @@ class FileController {
 
     @GetMapping("/list")
     @Operation(summary = "获取文件列表2")
-    fun list(pageModel: PageModel,fileInfo : FileInfo?) : ResultJSON<*>  {
+    fun list(pageModel: PageModel,fileInfo : FileInfo?) : ResultJSON<CoverToPage<FileInfo>>  {
         val data = fileInfoService.findFilesByFolder(pageModel, fileInfo)
         return BlogUtil.coverToPage(data).successResult()
     }

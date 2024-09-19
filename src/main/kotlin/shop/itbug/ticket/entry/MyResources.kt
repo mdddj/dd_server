@@ -130,5 +130,9 @@ open class MyResources  {
     open var useAgent: MyUseAgent? = null
 
 
+    @Schema(description = "发布设备平台")
+    open var platformString: String? = null
+
+
 }
 

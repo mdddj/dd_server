@@ -4,6 +4,7 @@ import cn.hutool.core.io.FileUtil
 import io.minio.*
 import io.minio.errors.MinioException
 import io.minio.http.Method
+import shop.itbug.ticket.ex.log
 import shop.itbug.ticket.exception.BizException
 import java.io.InputStream
 
@@ -74,8 +75,8 @@ class MinioHandler(val model: MinioDetailModel) {
         } catch (e: BizException) {
             throw e
         } catch (e: MinioException) {
-            println("Error occurred: $e")
-            throw BizException("上传失败:$e")
+            log().warn("Error occurred: ${e.localizedMessage}")
+            throw BizException("上传文件失败:$e")
         }
     }
 

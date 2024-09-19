@@ -183,10 +183,11 @@ class FileInfoServiceImpl : FileInfoService {
         val outputStream = ByteArrayOutputStream()
         if (isImageFile) {
             val stream = file.inputStream
+            val fileBts = ByteArrayInputStream(file.bytes)
             val size = ImageIO.read(stream)
-            Thumbnails.of(stream).outputQuality(0.8)
-                .scale(0.5)
-                .size(size.width,size.height)
+            Thumbnails.of(fileBts).outputQuality(0.8)
+                .scale(0.8)
+                .outputFormat(FileNameUtil.extName(file.originalFilename))
                 .toOutputStream(outputStream)
             val bts = outputStream.toByteArray()
             inputStream = bts.inputStream()
