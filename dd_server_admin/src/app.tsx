@@ -62,7 +62,7 @@ export const layout: () => {
     menu: {
       locale: false,
     },
-    rightRender: (initialState: AppInitialStateModel | undefined) => {
+    rightRender: (initialState: any) => {
       return <>{initialState && <GlobalAppBar initState={initialState} />}</>;
     },
   };

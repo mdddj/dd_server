@@ -10,7 +10,7 @@ export default function Page() {
       <Card>
         <Upload
           name="file"
-          action={HOST_NAME + '/api/storage/upload'}
+          action={HOST_NAME + '/api/auth/simple-upload'}
           headers={getAuthorizationHeader()}
         >
           <Button icon={<UploadOutlined />}>选择文件后会自动上传</Button>

@@ -1,16 +1,6 @@
 import { defineConfig } from '@umijs/max';
-
 export default defineConfig({
-  antd: {
-    // theme: {
-    //   token: {
-    //     colorPrimary: "#d21279",
-    //     colorInfo: "#d21279",
-    //     colorSuccess: "#4fb51c",
-    //     colorWarning: "#f7a500",
-    //   },
-    // },
-  },
+  antd: {},
   access: {},
   model: {},
   initialState: {},
@@ -195,8 +185,8 @@ export default defineConfig({
       icon: 'ProjectOutlined',
       routes: [
         {
-          name:"列表",
-          path:"/friend/list",
+          name: "列表",
+          path: "/friend/list",
           component: './Friend/index'
         }
       ]
@@ -207,8 +197,8 @@ export default defineConfig({
       icon: 'ProjectOutlined',
       routes: [
         {
-          name:"列表",
-          path:"/text/list",
+          name: "列表",
+          path: "/text/list",
           component: './Text/List'
         }
       ]
@@ -236,8 +226,11 @@ export default defineConfig({
       component: './Setting',
     }
   ],
-
   npmClient: 'pnpm',
   tailwindcss: {},
-  esbuildMinifyIIFE: true
+  title: "典典后台管理",
+  esbuildMinifyIIFE: true,
+  favicons: [
+    "/favicon.ico",
+  ],
 });

@@ -92,14 +92,15 @@ docker run --name dd_erver --network=host \
 ## 其他
 
 # 上传文件服务
+
 ```kotlin
 abstract class StorageAbstract {
-    abstract fun getLinkUrl(file: MultipartFile,subFolderName: String = "",host:String = "",user: User?) : FileInfo?
+    abstract fun getLinkUrl(file: MultipartFile, subFolderName: String = "", host: String = "", user: User?): FileInfo?
 }
 ///调用示例
 // 参数1 文件对象 - MultipartFile
 // 参数2 avatar - 二级目录名称,多个目录可以 avatar/user 像这样分开
-storageServiceImpl.getLinkUrl(file, "avatar", httpServletRequest.getCurrentHost(), user);
+storageServiceImpl.getLinkUrl(file, "avatar", httpServletRequest.getCurrentHost(), user)
 ```
 
 

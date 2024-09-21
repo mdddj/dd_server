@@ -1,22 +1,22 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val sbVersion = "3.3.0"
+val sbVersion = "3.3.3"
 
 group = "shop.itbug"
-version = "0.1.1"
+version = "0.1.6"
 description = "梁典典的后台服务"
 
-
 plugins {
-    `maven-publish`
     idea
-    id("org.jetbrains.kotlin.jvm") version "2.0.0"
-    id("org.springframework.boot") version "3.3.0"
+    kotlin("jvm") version "2.0.0"
     kotlin("plugin.spring") version "2.0.0"
-    id("io.spring.dependency-management") version "1.1.5"
     kotlin("plugin.serialization") version "2.0.0"
+    kotlin("plugin.allopen") version "2.0.0"
+    id("org.springframework.boot") version "3.3.3"
+    id("io.spring.dependency-management") version "1.1.5"
     id("com.google.osdetector") version "1.7.1"
+
 }
 
 repositories {
@@ -35,42 +35,31 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web:${sbVersion}")
     implementation("org.springframework.boot:spring-boot-starter-webflux:${sbVersion}")
     implementation("org.springframework.boot:spring-boot-starter-websocket:${sbVersion}")
+    testCompileOnly("org.springframework.boot:spring-boot-starter-test:${sbVersion}")
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:${sbVersion}")
+    compileOnly("org.springframework.boot:spring-boot-devtools:${sbVersion}")
     implementation("io.lettuce:lettuce-core:latest.release")
     implementation("org.jetbrains.kotlin:kotlin-stdlib:latest.release")
     implementation("com.alibaba.fastjson2:fastjson2:latest.release")
     implementation("com.alibaba.fastjson2:fastjson2-kotlin:latest.release")
     implementation("com.alibaba.fastjson2:fastjson2-extension-spring6:latest.release")
     implementation("cn.hutool:hutool-all:latest.release")
-    implementation("org.bouncycastle:bcprov-jdk15on:latest.release")
     implementation("commons-codec:commons-codec:latest.release")
     implementation("com.auth0:java-jwt:latest.release")
     implementation("com.sun.mail:javax.mail:latest.release")
     implementation("io.minio:minio:latest.release")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
-
-    compileOnly("org.springframework.boot:spring-boot-devtools:${sbVersion}")
     runtimeOnly("mysql:mysql-connector-java:latest.release")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:latest.release")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:latest.release")
-    testCompileOnly("org.springframework.boot:spring-boot-starter-test:${sbVersion}")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:latest.release")
-    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:${sbVersion}")
     implementation("org.junit.vintage:junit-vintage-engine:5.10.2")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:latest.release")
     implementation("com.github.oshi:oshi-core:6.6.1")
+    implementation("net.coobird:thumbnailator:0.4.20")
     implementation(kotlin("reflect"))
     if (osdetector.classifier == "osx-aarch_64") {
         runtimeOnly("io.netty:netty-resolver-dns-native-macos:4.1.77.Final:${osdetector.classifier}")
-    }
-}
-
-
-
-subprojects {
-    apply(plugin = "org.jetbrains.kotlin.jvm")
-    dependencies {
-        implementation("org.springframework.boot:spring-boot-starter-web:${sbVersion}")
-
     }
 }
 
@@ -109,4 +98,11 @@ kotlin {
 
 tasks.bootJar {
     archiveFileName.set("dd_service.jar")
+}
+
+idea {
+    module {
+        isDownloadJavadoc = true
+        isDownloadSources = true
+    }
 }

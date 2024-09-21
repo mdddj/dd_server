@@ -1,5 +1,7 @@
-export const DEFAULT_NAME = '典后台';
-export const HOST_NAME = 'https://api.itbug.shop';
- // export const HOST_NAME = 'http://127.0.0.1:8082';
-export const WS_URL = 'wss://api.itbug.shop';
- // export const WS_URL = 'ws://127.0.0.1:8082';
+
+let isProduct =  process.env.NODE_ENV === 'production';
+let host = isProduct ? 'https://api.itbug.shop' : 'http://localhost:8082';
+let wss = isProduct ? 'wss://api.itbug.shop' : 'ws://localhost:8082';
+export const HOST_NAME = host
+export const WS_URL = wss
+export const DEFAULT_NAME = '典后台'
