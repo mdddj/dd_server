@@ -11,4 +11,7 @@ class StatisticsResultModel {
     var tags: List<Tag>? = null
     var monthsCounts: List<MonthResultModel>? = null
     var archiveModels: List<ArchiveModel>? = null
+
+    //idea的博客文档,名称
+    var ideaDocs: List<String>? = null
 }
