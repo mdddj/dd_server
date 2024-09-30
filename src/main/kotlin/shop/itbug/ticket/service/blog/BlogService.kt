@@ -129,7 +129,13 @@ interface BlogService {
     fun getMonthBlogsWithMonth(month: String): List<MonthBlogModel>
     val isEmpty: Boolean
 
+    /**
+     * 获取全部博客
+     */
     fun findAll() : List<Blog>
 
+    /**
+     * 获取博客统计数据
+     */
     fun getDataStatistics(): StatisticsResultModel
 }

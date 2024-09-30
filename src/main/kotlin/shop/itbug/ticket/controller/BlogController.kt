@@ -72,11 +72,6 @@ class BlogController {
         return categoryService.findAll(pageModel, category).successResult("获取成功")
     }
 
-    @PostMapping("/update-category")
-    @Operation(summary = "添加或者修改博客分类")
-    fun updateBlogCategory(@RequestBody category: Category) : R<Category> {
-        return categoryService.save(category).successResult("操作成功")
-    }
 
 
 

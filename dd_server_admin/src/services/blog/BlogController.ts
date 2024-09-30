@@ -64,7 +64,7 @@ export async function MyBlogControllerWithFindBlogCategoryList(
 export async function MyBlogControllerWithUpdateBlogCategory(
   params: BlogCategory,
 ): Promise<Result<BlogCategory>> {
-  return request('/api/blog/update-category', {
+  return request('/api/auth/category/update', {
     method: 'POST',
     data: params,
   });
