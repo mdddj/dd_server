@@ -11,5 +11,6 @@ class RedisKeys {
         const val DTK_SERVICE: String = "dtk_service_"
         const val TAG: String = "tag_"
         const val PROJECT: String = "project_"
+        const val IDEA_DOC : String = "idea_doc_"
     }
 }

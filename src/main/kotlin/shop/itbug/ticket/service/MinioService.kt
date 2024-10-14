@@ -61,6 +61,15 @@ class MinioService {
     }
 
 
+    /**
+     * 删除某个对象
+     */
+    fun deleteObjectByName( objectName:String) {
+        action { handle, model ->
+            handle.deleteObject(model.bucketName, objectName)
+        }
+    }
+
 
     private fun <T> action(doHandle: (handle: MinioHandler, model: MinioDetailModel) -> T): T {
         val minioSetting = minioConfig.setting

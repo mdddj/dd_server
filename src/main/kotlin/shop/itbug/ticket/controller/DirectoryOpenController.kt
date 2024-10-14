@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import shop.itbug.ticket.entry.directory.DirectoryDto
 import shop.itbug.ticket.entry.directory.DirectoryService
 import shop.itbug.ticket.entry.directory.DocDirectory
 import shop.itbug.ticket.utils.R
@@ -29,7 +30,7 @@ class DirectoryOpenController {
 
     @GetMapping("/doc/list")
     @Operation(summary = "获取全部的已保存博客")
-    fun findAllRoot(): R<List<DocDirectory>>{
+    fun findAllRoot(): R<List<DirectoryDto>>{
         val all =  directoryService.findAllRoot()
         return all.successResult()
     }
@@ -37,7 +38,7 @@ class DirectoryOpenController {
 
     @GetMapping("/doc/{name}")
     @Operation(summary = "查找某个root博客")
-    fun findByName(@PathVariable(name = "name") name: String): R<DocDirectory>{
+    fun findByName(@PathVariable(name = "name") name: String): R<DirectoryDto>{
         return directoryService.findRootByName(name).successResult()
     }
 }

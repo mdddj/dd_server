@@ -2,7 +2,10 @@ package shop.itbug.ticket.entry.directory
 
 import jakarta.annotation.Resource
 import jakarta.transaction.Transactional
+import org.hibernate.annotations.Cache
 import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Cacheable
+import org.springframework.cache.annotation.Caching
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
@@ -74,11 +77,18 @@ class DirectoryServiceImpl : DirectoryService {
         return savedDirectory
     }
 
-    override fun findAllRoot(): List<DocDirectory> {
-        return directoryRepository.findAllByParentIsNull()
+    @Cacheable(RedisKeys.IDEA_DOC, key = "'all'")
+    override fun findAllRoot(): List<DirectoryDto> {
+        return directoryRepository.findAllByParentIsNull().map { it.getDto() }
     }
 
-    @CacheEvict(RedisKeys.BLOG_KEY + "statistics", allEntries = true)
+    @Caching(
+        evict = [
+            CacheEvict(RedisKeys.BLOG_KEY + "statistics", allEntries = true),
+            CacheEvict(cacheNames = [RedisKeys.IDEA_DOC], key = "#rootName"),
+            CacheEvict(cacheNames = [RedisKeys.IDEA_DOC], key = "'all'")
+        ]
+    )
     override fun deleteByName(rootName: String) {
         val directory =
             directoryRepository.findByNameAndParentIsNull(rootName) ?: throw BizException(CommonEnum.NOT_FOUND)
@@ -86,7 +96,9 @@ class DirectoryServiceImpl : DirectoryService {
 
     }
 
-    override fun findRootByName(name: String): DocDirectory {
-        return directoryRepository.findByNameAndParentIsNull(name) ?: throw BizException(CommonEnum.NOT_FOUND)
+    @Cacheable(cacheNames = [RedisKeys.IDEA_DOC], key = "#name")
+    override fun findRootByName(name: String): DirectoryDto {
+        val entity = directoryRepository.findByNameAndParentIsNull(name) ?: throw BizException(CommonEnum.NOT_FOUND)
+        return entity.getDto()
     }
 }

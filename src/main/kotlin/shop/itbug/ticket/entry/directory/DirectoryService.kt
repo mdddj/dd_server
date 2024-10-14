@@ -16,7 +16,7 @@ interface DirectoryService {
     /**
      * 获取全部的博客
      */
-    fun findAllRoot(): List<DocDirectory>
+    fun findAllRoot(): List<DirectoryDto>
 
     /**
      * 删除某个博客记录
@@ -26,5 +26,5 @@ interface DirectoryService {
     /**
      * 根据名称查找博客
      */
-    fun findRootByName(name: String): DocDirectory
+    fun findRootByName(name: String): DirectoryDto
 }

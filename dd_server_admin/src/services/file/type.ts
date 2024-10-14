@@ -15,4 +15,6 @@ export interface FileInfo {
   width: number;
   thumbnailPath: string | undefined;
   thumbnail: string | undefined;
+  minioObjectName: string | undefined;
+  minioBucketName: string | undefined;
 }

@@ -39,6 +39,10 @@ class DocDirectory : Serializable {
 
     @Schema(description = "介绍")
     var introduce: String? = null
+
+    fun getDto(): DirectoryDto {
+        return DirectoryDto(id,name,introduce,children.map { it.getDto() },files.map { it.getDto() })
+    }
 }
 
 
@@ -60,7 +64,7 @@ class MarkdownFile : Serializable {
     var name: String = ""
 
     @Schema(description = "文件名")
-    var filename: String? = null
+    var filename: String = ""
 
     @Lob
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
@@ -69,6 +73,11 @@ class MarkdownFile : Serializable {
 
     @Schema(description = "文件创建时间")
     var createDate: Date = Date()
+
+
+    fun getDto(): MarkdownFileDto {
+        return MarkdownFileDto(id,name,content,filename)
+    }
 
     companion object {
         fun create(name: String, content: String, directory: DocDirectory,filename: String): MarkdownFile {
@@ -83,6 +92,7 @@ class MarkdownFile : Serializable {
 }
 
 data class DirectoryDto(
+    var id: Long? = null,
     val name: String,
     val introduce: String? = null,
     val children: List<DirectoryDto> = emptyList(),
@@ -90,6 +100,7 @@ data class DirectoryDto(
 )
 
 data class MarkdownFileDto(
+    var id: Long? = null,
     val name: String,
     val content: String,
     val filename: String = ""
