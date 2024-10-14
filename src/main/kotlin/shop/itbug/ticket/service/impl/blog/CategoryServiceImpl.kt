@@ -178,7 +178,8 @@ class CategoryServiceImpl : CategoryService {
             CacheEvict(
                 value = [
                     RedisKeys.CATEGORY + "list",
-                    RedisKeys.CATEGORY + "count"
+                    RedisKeys.CATEGORY + "count",
+                    RedisKeys.BLOG_KEY + "all"
                 ], allEntries = true
             )
         ]

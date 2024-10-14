@@ -380,11 +380,9 @@ class AdminAuthController {
             info.fileName = filename
         }
 
-
         // 获取文件后缀,也就是文件类, 例子: .apk   .png
         val fileType = filename.substring(filename.lastIndexOf("."))
         info.fileType = fileType
-
 
         // 设置文件大小
         val size = file.size
@@ -394,12 +392,11 @@ class AdminAuthController {
         info.createDate = DateUtil.date()
 
         return try {
-
             // 保存到数据库
             val fileInfo = fileInfoService.saveOrUpdate(info)
 
             fileInfo.successResult("上传文件成功")
-        } catch (e: IOException) {
+        } catch (_: IOException) {
             throw BizException(CommonEnum.INTERNAL_SERVER_ERROR)
         }
     }

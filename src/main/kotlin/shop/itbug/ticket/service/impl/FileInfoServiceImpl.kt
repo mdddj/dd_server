@@ -4,8 +4,6 @@ import cn.hutool.core.date.DateUtil
 import cn.hutool.core.io.FileUtil
 import cn.hutool.core.io.file.FileNameUtil
 import jakarta.annotation.Resource
-import jakarta.servlet.http.HttpServletRequest
-import net.coobird.thumbnailator.Thumbnails
 import org.springframework.data.domain.Example
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -16,14 +14,10 @@ import org.springframework.web.multipart.MultipartFile
 import shop.itbug.ticket.admin.model.PageModel
 import shop.itbug.ticket.admin.model.getCurrentPage
 import shop.itbug.ticket.admin.model.getPageable
-import shop.itbug.ticket.controller.getCurrentHost
 import shop.itbug.ticket.dao.FileInfoRepository
 import shop.itbug.ticket.entry.FileInfo
 import shop.itbug.ticket.entry.FileInfoSaveConfig
-import shop.itbug.ticket.entry.ResourcesCategory
 import shop.itbug.ticket.entry.User
-import shop.itbug.ticket.entry.storage.StorageServiceImpl
-import shop.itbug.ticket.ex.log
 import shop.itbug.ticket.exception.BizException
 import shop.itbug.ticket.exception.CommonEnum
 import shop.itbug.ticket.exception.ResultDialogType
@@ -31,7 +25,6 @@ import shop.itbug.ticket.service.FileInfoService
 import shop.itbug.ticket.service.MinioService
 import shop.itbug.ticket.utils.FileManagerWrapper
 import shop.itbug.ticket.utils.ImageCheck
-import java.awt.Dimension
 import java.io.*
 import javax.imageio.ImageIO
 
@@ -118,6 +111,11 @@ class FileInfoServiceImpl : FileInfoService {
                     }
                 }
             }
+
+            //删除minio
+            info.minioObjectName?.let {
+                minioService.deleteObjectByName(it)
+            }
         }
     }
 
@@ -177,34 +175,24 @@ class FileInfoServiceImpl : FileInfoService {
             this.isImage = isImageFile
             originalFilename = file.originalFilename
         }
-        ///对图片进行压缩
-        val inputStream: InputStream
+        val inputStream: InputStream = file.inputStream
         val fileSize: Long
-        val outputStream = ByteArrayOutputStream()
         if (isImageFile) {
-            val stream = file.inputStream
-            val fileBts = ByteArrayInputStream(file.bytes)
-            val size = ImageIO.read(stream)
-            Thumbnails.of(fileBts).outputQuality(0.8)
-                .scale(0.8)
-                .outputFormat(FileNameUtil.extName(file.originalFilename))
-                .toOutputStream(outputStream)
-            val bts = outputStream.toByteArray()
-            inputStream = bts.inputStream()
-            fileSize = bts.size.toLong()
+            val buf = inputStream.buffered()
+            val size = ImageIO.read(buf)
+            fileSize = file.size
             fileInfo.width = size.width
             fileInfo.height = size.height
+            buf.close()
         } else {
-            inputStream = file.inputStream
             fileSize = file.size
         }
         val model = minioService.uploadFileWithInputStream(
-            inputStream,
+            file.inputStream,
             finalName,
             folderName,
             fileSize
         )
-        outputStream.close()
 
         if (isImageFile){
             fileInfo.thumbnail = model.fullUrl
@@ -237,19 +225,4 @@ class FileInfoServiceImpl : FileInfoService {
         return fileInfos
     }
 
-    fun getImageDimensions(file: MultipartFile): Dimension? {
-        try {
-            file.inputStream.use { inputStream ->
-                val image = ImageIO.read(inputStream)
-                if (image != null) {
-                    val width = image.width
-                    val height = image.height
-                    return Dimension(width, height)
-                }
-            }
-            return null
-        } catch (e: IOException) {
-            return null
-        }
-    }
 }

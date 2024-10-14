@@ -32,6 +32,11 @@ export default function Page() {
                 </Space>
               ),
             },
+            description: {
+              render: (_,entity)=>{
+                return <>minio名称:{entity.minioObjectName} - {entity.minioBucketName}</>
+              }
+            },
             subTitle: {
               dataIndex: 'createDate',
               render: (dom) => {

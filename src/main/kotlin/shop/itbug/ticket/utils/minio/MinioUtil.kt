@@ -94,6 +94,13 @@ class MinioHandler(val model: MinioDetailModel) {
         }
     }
 
+
+    fun deleteObject(bucketName: String, objectName: String) {
+        minioClient.removeObject(RemoveObjectArgs.builder().bucket(bucketName)
+            .`object`(objectName)
+            .build())
+    }
+
     private fun getObjectUrl(bucketName: String, objectName: String): MinioObjectResult {
         val objectUrl = try {
             minioClient.getPresignedObjectUrl(

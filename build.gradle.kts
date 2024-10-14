@@ -1,19 +1,19 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val sbVersion = "3.3.3"
+val sbVersion = "3.3.4"
 
 group = "shop.itbug"
-version = "0.1.6"
+version = "0.1.7"
 description = "梁典典的后台服务"
 
 plugins {
     idea
-    kotlin("jvm") version "2.0.0"
-    kotlin("plugin.spring") version "2.0.0"
-    kotlin("plugin.serialization") version "2.0.0"
-    kotlin("plugin.allopen") version "2.0.0"
-    id("org.springframework.boot") version "3.3.3"
+    kotlin("jvm") version "2.0.20"
+    kotlin("plugin.spring") version "2.0.20"
+    kotlin("plugin.serialization") version "2.0.20"
+    kotlin("plugin.allopen") version "2.0.20"
+    id("org.springframework.boot") version "3.3.4"
     id("io.spring.dependency-management") version "1.1.5"
     id("com.google.osdetector") version "1.7.1"
 

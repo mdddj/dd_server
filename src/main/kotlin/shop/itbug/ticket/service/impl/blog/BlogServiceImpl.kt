@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service
 import shop.itbug.ticket.dao.blog.BlogDao
 import shop.itbug.ticket.entry.blog.Blog
 import shop.itbug.ticket.entry.blog.Tag
+import shop.itbug.ticket.entry.directory.DirectoryService
 import shop.itbug.ticket.exception.BizException
 import shop.itbug.ticket.exception.CommonEnum
 import shop.itbug.ticket.model.api.CachePage
@@ -40,6 +41,9 @@ class BlogServiceImpl : BlogService {
 
     @Resource
     private lateinit var categoryService: CategoryService
+
+    @Resource
+    private lateinit var directoryService: DirectoryService
 
     /**
      * 发布一篇博客
@@ -117,6 +121,7 @@ class BlogServiceImpl : BlogService {
         val tags = tagService.selectAll()
         val monthCount = blogDao.countWithMonths()
         val archiveModels: MutableList<ArchiveModel> = ArrayList()
+        val ideaNames = directoryService.findAllRoot().map { it.name }
         for (model in monthCount) {
             val model1 = ArchiveModel()
             model1.count = model.count
@@ -132,6 +137,7 @@ class BlogServiceImpl : BlogService {
         statisticsResultModel.tags = tags
         statisticsResultModel.monthsCounts = monthCount
         statisticsResultModel.archiveModels = archiveModels
+        statisticsResultModel.ideaDocs = ideaNames
         return statisticsResultModel
     }
 
