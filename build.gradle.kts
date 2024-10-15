@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 val sbVersion = "3.3.4"
 
 group = "shop.itbug"
-version = "0.1.7"
+version = "0.1.8"
 description = "梁典典的后台服务"
 
 plugins {
