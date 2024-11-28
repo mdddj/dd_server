@@ -1,19 +1,19 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val sbVersion = "3.3.4"
+val sbVersion = "3.4.0"
 
 group = "shop.itbug"
-version = "0.1.8"
+version = "0.2.2"
 description = "梁典典的后台服务"
 
 plugins {
     idea
-    kotlin("jvm") version "2.0.20"
-    kotlin("plugin.spring") version "2.0.20"
-    kotlin("plugin.serialization") version "2.0.20"
-    kotlin("plugin.allopen") version "2.0.20"
-    id("org.springframework.boot") version "3.3.4"
+    kotlin("jvm") version "2.0.21"
+    kotlin("plugin.spring") version "2.0.21"
+    kotlin("plugin.serialization") version "2.0.21"
+    kotlin("plugin.allopen") version "2.0.21"
+    id("org.springframework.boot") version "3.4.0"
     id("io.spring.dependency-management") version "1.1.5"
     id("com.google.osdetector") version "1.7.1"
 
@@ -68,6 +68,7 @@ dependencies {
 
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
+    java.sourceCompatibility = JavaVersion.VERSION_21
 }
 
 

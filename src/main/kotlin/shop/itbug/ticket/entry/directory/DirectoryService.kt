@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service
 
 @Service
 interface DirectoryService {
-    fun findAll(): List<DocDirectory>
+    fun findAll(): List<DirectoryDto>
     fun save(entity: DocDirectory): DocDirectory
     fun deleteById(id: Long)
     fun findById(id: Long): DocDirectory?

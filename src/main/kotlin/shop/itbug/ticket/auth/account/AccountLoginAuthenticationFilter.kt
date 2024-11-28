@@ -21,7 +21,7 @@ class AccountLoginAuthenticationFilter : AbstractAuthenticationProcessingFilter(
 
     private val loginType = "account"
 
-    override fun attemptAuthentication(request: HttpServletRequest, response: HttpServletResponse?): Authentication {
+    override fun attemptAuthentication(request: HttpServletRequest, response: HttpServletResponse): Authentication {
         if (request.method != "POST") {
             throw AuthenticationServiceException("不支持的方法")
         }

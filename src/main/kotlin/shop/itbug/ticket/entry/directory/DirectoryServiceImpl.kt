@@ -21,8 +21,8 @@ class DirectoryServiceImpl : DirectoryService {
 
     @Resource
     lateinit var markdownFileRepository: MarkdownRepository
-    override fun findAll(): List<DocDirectory> {
-        return directoryRepository.findAll()
+    override fun findAll(): List<DirectoryDto> {
+        return directoryRepository.findAll().map { it.getDto() }
     }
 
     override fun save(entity: DocDirectory): DocDirectory {
