@@ -8,7 +8,7 @@ data class PushNewBlogParams(
     val title: String,
     val content: String,
     val tags: Set<String> = setOf(),
-    val categoryId: Long,
+    val categoryId: Long? = null,
     val alias: String = "",
     val thumbnail: String = "",
     val id: Long? = null,

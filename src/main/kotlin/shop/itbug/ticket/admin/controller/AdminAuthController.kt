@@ -137,24 +137,42 @@ class AdminAuthController {
     @Operation(summary = "发布新博客")
     fun pushBlog(@RequestBody @Validated params: PushNewBlogParams, bindingResult: BindingResult): Result<Blog> {
         bindingResult.verify()
-        val tagsSet = HashSet<BlogTag>()
-        params.tags.forEach(Consumer { s: String -> tagsSet.add(BlogTag(s)) })
-        val save = tagService.save(tagsSet)
+
         try {
             return if (params.id != null) {
-                val category = categoryService.select(params.categoryId)
+                val category = params.categoryId?.let { categoryService.select(it) }
                 val updateBlog = blogService.select(params.id)
-                updateBlog.tags = save
+                if(params.tags.isNotEmpty()){
+                    val tagsSet = HashSet<BlogTag>()
+                    params.tags.forEach(Consumer { s: String -> tagsSet.add(BlogTag(s)) })
+                    val save = tagService.save(tagsSet)
+                    if(save.isNotEmpty()){
+                        updateBlog.tags = save
+                    }
+                }
                 updateBlog.title = params.title
                 updateBlog.content = params.content
-                updateBlog.category = category
-                updateBlog.aliasString = params.alias
-                updateBlog.html = params.html
-                updateBlog.thumbnail = params.thumbnail
+                if(category!=null){
+                    updateBlog.category = category
+                }
+                if(params.alias.isNotBlank()){
+                    updateBlog.aliasString = params.alias
+                }
+                if(params.html.isNotBlank()){
+                    updateBlog.html = params.html
+                }
+                if(params.thumbnail.isNotBlank()){
+                    updateBlog.thumbnail = params.thumbnail
+                }
+
                 val blog = blogService.update(updateBlog)
                 Result.ok(blog)
             } else {
                 // 执行新增
+                val tagsSet = HashSet<BlogTag>()
+                params.tags.forEach(Consumer { s: String -> tagsSet.add(BlogTag(s)) })
+                val save = tagService.save(tagsSet)
+                params.categoryId ?: throw BizException("请传入分类参数")
                 val blog = blogService.create(
                     params.title, params.content,
                     params.categoryId, params.alias, save, params.html
@@ -320,8 +338,7 @@ class AdminAuthController {
     @PostMapping("/resource-save")
     @Operation(summary = "修改动态")
     fun save(
-        @RequestBody @Validated myResources: MyResources,
-        @GetLoginUser user: User
+        @RequestBody @Validated myResources: MyResources
     ): Result<*> {
         val model = myResourceService.findById(myResources.id!!) ?: throw BizException("获取动态数据失败")
         model.updateDate = model.id?.let { DateUtil.date() } //修改更新时间

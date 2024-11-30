@@ -3,10 +3,10 @@
 ## 1.运行环境
 
 * Java:22
-* Springboot:3.3.0
-* Kotlin:2.0.0
-* Mysql:8.2
-* Redis:7
+* Springboot:3.4.0
+* Kotlin:2.0.21
+* Mysql:8.2 (dev: 9.1.0)
+* Redis:7.4.1
 
 
 > 提示后台前端代码在`dd_server_admin`目录

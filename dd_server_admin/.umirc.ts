@@ -104,7 +104,24 @@ export default defineConfig({
           path: '/blog/categorys',
           component: './Blog/Category',
         },
+        {
+          name: "博客标签",
+          path: '/blog/tags',
+          component: './Blog/tags',
+        }
       ],
+    },
+    {
+      name: "文档",
+      path: "/ideadoc",
+      icon: "ProfileOutlined",
+      routes:[
+        {
+          name: '列表',
+          path: '/ideadoc/all',
+          component: './Doc/index',
+        }
+      ]
     },
     {
       name: '资源管理',

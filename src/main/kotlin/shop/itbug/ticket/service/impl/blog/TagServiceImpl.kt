@@ -44,7 +44,7 @@ class TagServiceImpl : TagService {
     @Caching(
         evict = [
             CacheEvict(
-                value = [RedisKeys.TAG + "findBlogsByTagId", RedisKeys.TAG + "count", RedisKeys.TAG + "all",RedisKeys.TAG+"selectById",RedisKeys.TAG+"selectByName"],
+                value = [RedisKeys.TAG + "findBlogsByTagId", RedisKeys.TAG + "count", RedisKeys.TAG + "all", RedisKeys.TAG + "selectById", RedisKeys.TAG + "selectByName"],
                 allEntries = true
             )
         ]
@@ -61,7 +61,7 @@ class TagServiceImpl : TagService {
      */
     @Caching(
         cacheable = [
-            Cacheable(value = [RedisKeys.TAG+"selectByName"], key = "#name")
+            Cacheable(value = [RedisKeys.TAG + "selectByName"], key = "#name")
         ]
     )
     override fun select(name: String): Tag? {
@@ -80,7 +80,7 @@ class TagServiceImpl : TagService {
      */
     @Caching(
         cacheable = [
-            Cacheable(value = [RedisKeys.TAG+"selectById"], key = "#id")
+            Cacheable(value = [RedisKeys.TAG + "selectById"], key = "#id")
         ]
     )
     override fun select(id: Long): Tag? {
@@ -96,20 +96,24 @@ class TagServiceImpl : TagService {
     @Caching(
         evict = [
             CacheEvict(
-                value = [RedisKeys.TAG + "findBlogsByTagId", RedisKeys.TAG + "count", RedisKeys.TAG + "all",RedisKeys.TAG+"selectById",RedisKeys.TAG+"selectByName"],
+                value = [RedisKeys.TAG + "findBlogsByTagId", RedisKeys.TAG + "count", RedisKeys.TAG + "all", RedisKeys.TAG + "selectById", RedisKeys.TAG + "selectByName"],
                 allEntries = true
             )
         ]
     )
     override fun delete(id: Long) {
-        tagDao.deleteById(id)
+        try {
+            tagDao.deleteById(id)
+        } catch (e: Exception) {
+            throw BizException("删除失败:${e.localizedMessage}")
+        }
     }
 
 
     @Caching(
         evict = [
             CacheEvict(
-                value = [RedisKeys.TAG + "findBlogsByTagId", RedisKeys.TAG + "count", RedisKeys.TAG + "all",RedisKeys.TAG+"selectById",RedisKeys.TAG+"selectByName"],
+                value = [RedisKeys.TAG + "findBlogsByTagId", RedisKeys.TAG + "count", RedisKeys.TAG + "all", RedisKeys.TAG + "selectById", RedisKeys.TAG + "selectByName"],
                 allEntries = true
             )
         ]
@@ -127,7 +131,7 @@ class TagServiceImpl : TagService {
     @Caching(
         evict = [
             CacheEvict(
-                value = [RedisKeys.TAG + "findBlogsByTagId", RedisKeys.TAG + "count", RedisKeys.TAG + "all",RedisKeys.TAG+"selectById",RedisKeys.TAG+"selectByName"],
+                value = [RedisKeys.TAG + "findBlogsByTagId", RedisKeys.TAG + "count", RedisKeys.TAG + "all", RedisKeys.TAG + "selectById", RedisKeys.TAG + "selectByName"],
                 allEntries = true
             )
         ]

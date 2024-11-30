@@ -41,7 +41,7 @@ class DocDirectory : Serializable {
     var introduce: String? = null
 
     fun getDto(): DirectoryDto {
-        return DirectoryDto(id,name,introduce,children.map { it.getDto() },files.map { it.getDto() })
+        return DirectoryDto(id,name,introduce,children.map { it.getDto() },files.map { it.getDto() },createDate)
     }
 }
 
@@ -96,7 +96,8 @@ data class DirectoryDto(
     val name: String,
     val introduce: String? = null,
     val children: List<DirectoryDto> = emptyList(),
-    val files: List<MarkdownFileDto> = emptyList()
+    val files: List<MarkdownFileDto> = emptyList(),
+    val createDate: Date = Date()
 )
 
 data class MarkdownFileDto(
