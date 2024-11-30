@@ -4,15 +4,15 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 val sbVersion = "3.4.0"
 
 group = "shop.itbug"
-version = "0.2.2"
+version = "0.2.3"
 description = "梁典典的后台服务"
 
 plugins {
     idea
-    kotlin("jvm") version "2.0.21"
-    kotlin("plugin.spring") version "2.0.21"
-    kotlin("plugin.serialization") version "2.0.21"
-    kotlin("plugin.allopen") version "2.0.21"
+    kotlin("jvm") version "2.1.0"
+    kotlin("plugin.spring") version "2.1.0"
+    kotlin("plugin.serialization") version "2.1.0"
+    kotlin("plugin.allopen") version "2.1.0"
     id("org.springframework.boot") version "3.4.0"
     id("io.spring.dependency-management") version "1.1.5"
     id("com.google.osdetector") version "1.7.1"
