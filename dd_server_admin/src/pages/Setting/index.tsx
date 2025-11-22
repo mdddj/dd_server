@@ -1,7 +1,6 @@
 import React from 'react';
 import { PageContainer } from '@ant-design/pro-components';
-import { Tabs, Tab,  } from '@nextui-org/react';
-import { Form, Input, Card, Button } from 'antd';
+import { Form, Input, Card, Button, Tabs } from 'antd';
 import { request } from '@umijs/max';
 import { Result } from '@/types/result';
 import {removeJwtToken} from "@/utils/cache";
@@ -25,28 +24,39 @@ export default function Page() {
   };
   return (
     <PageContainer>
-      <Tabs>
-        <Tab key={'profile'} title={'个人资料'}>
-          <Card>
+      <Tabs items={[
+        {
+          key: "profile",
+          label: "Profile",
+          children: <Card>
             暂无
           </Card>
-        </Tab>
-        <Tab key="minio-config" title={'minio配置'}>
-        <MinioInfoWidget />
-        </Tab>
-        <Tab key="email-config" title={'邮件配置'}>
-        <MailConfigShow />
-        </Tab>
-        <Tab key="zhe-config" title={'折淘客配置'}>
-        <ChangeZheConfigComponent />
-        </Tab>
-        <Tab key={'mini-app-config'} title={'小程序配置'}>
-          <Card>
-            <MiniAppConfigModelForm trigger={<Button>修改配置</Button>}/>
-          </Card>
-        </Tab>
-        <Tab key={'password'} title={'修改密码'}>
-          <Card>
+        },
+        {
+          key: "minio-config",
+          label: "minio配置",
+          children:   <MinioInfoWidget />
+        },
+        {
+          key: "email-config",
+          label: "邮件配置",
+          children: <MailConfigShow />
+        },
+        {
+          key: "zhe-config",
+          label: "折淘客配置",
+          children: <ChangeZheConfigComponent />
+        }
+        ,
+        {
+          key: "mini-app-config",
+          label: "小程序配置",
+          children: <Card><MiniAppConfigModelForm trigger={<Button>修改配置</Button>} /></Card>
+        },
+        {
+          key: "password",
+          label: "修改密码",
+          children: <Card>
             <Form onFinish={submit} layout={'vertical'}>
               <Form.Item name={'currentPass'} label={'当前密码'} required={true} rules={[{required:true}]}>
                 <Input  type='password' />
@@ -82,7 +92,9 @@ export default function Page() {
               </Form.Item>
             </Form>
           </Card>
-        </Tab>
+        }
+      ]}>
+
       </Tabs>
     </PageContainer>
   );

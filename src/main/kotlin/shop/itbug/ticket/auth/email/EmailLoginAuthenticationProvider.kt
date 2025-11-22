@@ -9,7 +9,7 @@ import shop.itbug.ticket.service.UserService
 import shop.itbug.ticket.utils.printToConsole
 
 //
-class EmailLoginAuthenticationProvider(val userService: UserService) : DaoAuthenticationProvider() {
+class EmailLoginAuthenticationProvider(val userService: UserService) : DaoAuthenticationProvider(userService) {
 
     override fun authenticate(authentication: Authentication): Authentication? {
         if (authentication.isAuthenticated) {

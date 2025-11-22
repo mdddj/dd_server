@@ -7,6 +7,7 @@ import jakarta.annotation.Resource
 import org.springframework.data.domain.Example
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.crypto.factory.PasswordEncoderFactories
 import org.springframework.stereotype.Service
 import shop.itbug.ticket.admin.controller.AdminAuthController
@@ -272,6 +273,10 @@ class UserServiceImpl : UserService {
             throw BizException("密码验证失败")
         }
 
+    }
+
+    override fun loadUserByUsername(username: String): UserDetails {
+        return findByLoginNumber(username) as UserDetails
     }
 }
 

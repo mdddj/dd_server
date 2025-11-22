@@ -137,7 +137,6 @@ class AdminAuthController {
     @Operation(summary = "发布新博客")
     fun pushBlog(@RequestBody @Validated params: PushNewBlogParams, bindingResult: BindingResult): Result<Blog> {
         bindingResult.verify()
-
         try {
             return if (params.id != null) {
                 val category = params.categoryId?.let { categoryService.select(it) }
@@ -341,7 +340,7 @@ class AdminAuthController {
         @RequestBody @Validated myResources: MyResources
     ): Result<*> {
         val model = myResourceService.findById(myResources.id!!) ?: throw BizException("获取动态数据失败")
-        model.updateDate = model.id?.let { DateUtil.date() } //修改更新时间
+        model.updateDate = model.id?.let {_ -> DateUtil.date() } //修改更新时间
         myResources.content?.let { model.content = it }//修改正文内容
         myResources.label?.let { model.label = it }  //修改标签
         myResources.title?.let { model.title = it } //修改标题

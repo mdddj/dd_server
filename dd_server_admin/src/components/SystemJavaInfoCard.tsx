@@ -1,7 +1,7 @@
 import { request, useRequest } from '@umijs/max';
 import React from 'react';
-import { Card, CardBody, CardHeader, Divider } from '@nextui-org/react';
 import { Result } from '@/types/result';
+import { Card } from 'antd';
 
 
 interface SystemJavaInfo {
@@ -136,23 +136,15 @@ async function getSystemInfo(): Promise<Result<SystemJavaInfo>> {
 
 const SystemJavaInfoCard: React.FC = () => {
   const { data, loading } = useRequest<SystemJavaInfo>(() => getSystemInfo());
-  return <Card>
-    <CardHeader>
-      <h4 className={'font-bold text-lg'}>系统信息</h4>
-    </CardHeader>
-    <Divider />
-    <CardBody>
-      {loading && <div>加载中</div>}
-      {
-        data && <div className={'flex flex-col gap-2'}>
-
-          <InfoItem title={'java版本'} value={data.javaInfo.version + `(${data?.javaSpecInfo.vendor})`} />
-          <InfoItem title={'jvm'} value={`${data?.jvmInfo.name}`} />
-          <InfoItem title={'系统类型'} value={`${data?.osInfo.name} ${data?.osInfo.version} ${data?.osInfo.arch}`} />
-          <InfoItem title={'主机名称'} value={`${data?.userInfo.name}`} />
-        </div>
-      }
-    </CardBody>
+  return <Card title={'系统信息'} loading={loading || !data}>
+    {
+      data &&  <div className={'flex flex-col gap-2'}>
+        <InfoItem title={'java版本'} value={data?.javaInfo.version + `(${data?.javaSpecInfo.vendor})`} />
+        <InfoItem title={'jvm'} value={`${data?.jvmInfo.name}`} />
+        <InfoItem title={'系统类型'} value={`${data?.osInfo.name} ${data?.osInfo.version} ${data?.osInfo.arch}`} />
+        <InfoItem title={'主机名称'} value={`${data?.userInfo.name}`} />
+      </div>
+    }
   </Card>;
 };
 

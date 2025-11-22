@@ -8,7 +8,6 @@ import jakarta.annotation.Resource
 import kotlinx.serialization.json.Json
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
-import shop.itbug.ticket.ex.log
 import shop.itbug.ticket.exception.BizException
 import shop.itbug.ticket.model.params.OpenScPublisherGetParam
 import shop.itbug.ticket.model.params.ScResult
@@ -36,6 +35,7 @@ class ZheController {
 
     @Resource
     private lateinit var zheConfigService: ZheConfigService
+
 
     @GetMapping("/mt/tg")
     @Operation(summary = "美团领券")
@@ -160,7 +160,6 @@ class ZheController {
                 "activity_id" to params.activityId,
                 "customer_id" to params.customerId
             ))
-            log().info(result)
             val decodeFromString = Json.decodeFromString(ElmResultModel.serializer(), result)
 
             return decodeFromString.successResult("获取成功")

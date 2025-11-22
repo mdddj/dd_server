@@ -11,3 +11,5 @@ pluginManagement {
     }
 }
 rootProject.name = "dd_service"
+
+//include("zhetao_sdk")

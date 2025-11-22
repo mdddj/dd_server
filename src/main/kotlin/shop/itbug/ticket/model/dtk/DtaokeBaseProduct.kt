@@ -1,9 +1,13 @@
 package shop.itbug.ticket.model.dtk
 
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 
 
+@OptIn(ExperimentalSerializationApi::class)
+@JsonIgnoreUnknownKeys
 @Serializable
 data class DtaokeBaseProduct (
     val id: Long? = null,

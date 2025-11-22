@@ -1,16 +1,22 @@
+@file:OptIn(ExperimentalSerializationApi::class)
+
 package shop.itbug.ticket.model.zhe
 
 
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 
 @Serializable
+@JsonIgnoreUnknownKeys
 data class ElmResultModel (
     @SerialName("alibaba_alsc_union_eleme_promotion_officialactivity_get_response")
     val alibabaAlscUnionElemePromotionOfficialactivityGetResponse: AlibabaAlscUnionElemePromotionOfficialactivityGetResponse? = null
 )
 
 @Serializable
+@JsonIgnoreUnknownKeys
 data class AlibabaAlscUnionElemePromotionOfficialactivityGetResponse (
     val data: ElmData? = null,
     val message: String? = null,
@@ -23,6 +29,7 @@ data class AlibabaAlscUnionElemePromotionOfficialactivityGetResponse (
 )
 
 @Serializable
+@JsonIgnoreUnknownKeys
 data class ElmData (
     val description: String? = null,
 
@@ -40,6 +47,7 @@ data class ElmData (
 )
 
 @Serializable
+@JsonIgnoreUnknownKeys
 data class ElmLink (
     @SerialName("alipay_mini_url")
     val alipayMiniUrl: String? = null,

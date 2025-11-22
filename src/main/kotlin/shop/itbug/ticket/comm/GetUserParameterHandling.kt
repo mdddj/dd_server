@@ -24,10 +24,10 @@ class GetUserParameterHandling : HandlerMethodArgumentResolver {
 
     override fun resolveArgument(
         parameter: MethodParameter,
-        @Nullable mavContainer: ModelAndViewContainer?,
+        mavContainer: ModelAndViewContainer?,
         webRequest: NativeWebRequest,
-        @Nullable binderFactory: WebDataBinderFactory?
-    ): Any {
-        return SecurityContextHolder.getContext().authentication.principal as User
+        binderFactory: WebDataBinderFactory?
+    ): Any? {
+        return SecurityContextHolder.getContext().authentication?.principal as? User?
     }
 }

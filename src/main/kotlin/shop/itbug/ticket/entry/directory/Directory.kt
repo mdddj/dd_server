@@ -41,7 +41,21 @@ class DocDirectory : Serializable {
     var introduce: String? = null
 
     fun getDto(): DirectoryDto {
-        return DirectoryDto(id,name,introduce,children.map { it.getDto() },files.map { it.getDto() },createDate)
+        return DirectoryDto(
+            id,
+            name,
+            introduce,
+            children.map { it.getDto() }.sortedBy { dto ->
+                val num = dto.name.split(".")[0].toIntOrNull() ?: 0
+                num
+            },
+            files.map { it.getDto() }.sortedBy { dto ->
+                // 提取文件名中的数字部分（如"12.test.md" → 12）
+                val num = dto.filename.split(".")[0].toIntOrNull() ?: 0
+                num
+            },
+            createDate
+        )
     }
 }
 
@@ -76,11 +90,11 @@ class MarkdownFile : Serializable {
 
 
     fun getDto(): MarkdownFileDto {
-        return MarkdownFileDto(id,name,content,filename)
+        return MarkdownFileDto(id, name, content, filename,createDate)
     }
 
     companion object {
-        fun create(name: String, content: String, directory: DocDirectory,filename: String): MarkdownFile {
+        fun create(name: String, content: String, directory: DocDirectory, filename: String): MarkdownFile {
             return MarkdownFile().apply {
                 this.name = name
                 this.content = content
@@ -104,5 +118,6 @@ data class MarkdownFileDto(
     var id: Long? = null,
     val name: String,
     val content: String,
-    val filename: String = ""
+    val filename: String = "",
+    val createDate: Date = Date()
 )

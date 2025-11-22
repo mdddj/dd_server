@@ -5,9 +5,8 @@ import com.alibaba.fastjson2.JSONWriter
 import com.alibaba.fastjson2.filter.PropertyPreFilter
 import com.alibaba.fastjson2.support.spring6.data.redis.GenericFastJsonRedisSerializer
 import com.alibaba.fastjson2.toJSONString
-import jakarta.annotation.Resource
 import org.apache.commons.lang3.StringUtils
-import org.springframework.boot.autoconfigure.data.redis.RedisProperties
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.convert.converter.Converter
@@ -22,10 +21,7 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair
 import org.springframework.data.redis.serializer.StringRedisSerializer
-import shop.itbug.ticket.ex.log
 import java.time.Duration
-import kotlin.reflect.full.memberProperties
-import kotlin.reflect.jvm.isAccessible
 
 
 /**
@@ -35,18 +31,27 @@ import kotlin.reflect.jvm.isAccessible
 @Configuration
 class JedisRedisConfig {
 
-    @Resource
-    lateinit var redisProperties: RedisProperties
+    @Value("\${spring.data.redis.host}")
+    private lateinit var host: String
 
+    @Value("\${spring.data.redis.port}")
+    private lateinit var port: String
+
+    @Value("\${spring.data.redis.password}")
+    private lateinit var password: String
+
+
+    //redis构造工厂
     @Bean
     fun connectionFactory(): RedisConnectionFactory {
         val redisConf = RedisStandaloneConfiguration()
-        redisConf.hostName = redisProperties.host
-        redisConf.port = redisProperties.port
-        redisConf.setPassword(redisProperties.password)
+        redisConf.hostName = host
+        redisConf.port = port.toInt()
+        redisConf.setPassword(password)
         redisConf.database = 0
         return LettuceConnectionFactory(redisConf)
     }
+
 
     @Bean
     fun cacheManager(connectionFactory: RedisConnectionFactory): RedisCacheManager {
@@ -58,10 +63,10 @@ class JedisRedisConfig {
         ) // key的序列
         redisCacheConfiguration =
             redisCacheConfiguration.serializeValuesWith(SerializationPair.fromSerializer(GenericFastJsonRedisSerializer()))//value的序列化
-         redisCacheConfiguration.configureKeyConverters {
+        redisCacheConfiguration.configureKeyConverters {
             it.addConverterFactory(MyCovertFactory())
         }
-        redisCacheConfiguration.addCacheKeyConverter(object : Converter<Any,String> {
+        redisCacheConfiguration.addCacheKeyConverter(object : Converter<Any, String> {
             override fun convert(source: Any): String? {
                 return source.toJSONString(IgnoreEmptyStringPropertyFilter())
             }
@@ -69,7 +74,10 @@ class JedisRedisConfig {
         })
         redisCacheConfiguration = redisCacheConfiguration.prefixCacheNameWith("__")
 //        redisCacheConfiguration = redisCacheConfiguration.entryTtl(Duration.ofMinutes(60))
-        return CustomRedisCacheManager(RedisCacheWriter.nonLockingRedisCacheWriter(connectionFactory),redisCacheConfiguration)
+        return CustomRedisCacheManager(
+            RedisCacheWriter.nonLockingRedisCacheWriter(connectionFactory),
+            redisCacheConfiguration
+        )
     }
 
     @Bean
@@ -91,7 +99,8 @@ class JedisRedisConfig {
 }
 
 
-class CustomRedisCacheManager(writer: RedisCacheWriter, private val redisConfig: RedisCacheConfiguration): RedisCacheManager(writer,redisConfig) {
+class CustomRedisCacheManager(writer: RedisCacheWriter, private val redisConfig: RedisCacheConfiguration) :
+    RedisCacheManager(writer, redisConfig) {
     override fun createRedisCache(name: String, cacheConfiguration: RedisCacheConfiguration?): RedisCache {
         if (StringUtils.isNotEmpty(name) && name.contains("#")) {
             val split: List<String> = name.split("#")
@@ -121,37 +130,37 @@ class CustomRedisCacheManager(writer: RedisCacheWriter, private val redisConfig:
 }
 
 
-class MyStringKeySerializer : StringRedisSerializer(){
+class MyStringKeySerializer : StringRedisSerializer() {
     override fun serialize(value: String?): ByteArray {
         return super.serialize(value)
     }
 
-    override fun deserialize(bytes: ByteArray?): String {
+    override fun deserialize(bytes: ByteArray?): String? {
         return super.deserialize(bytes)
     }
 }
 
+
 class MyCovertFactory : ConverterFactory<Any, Any> {
-    override fun <T : Any?> getConverter(targetType: Class<T>): Converter<Any, T> {
+    override fun <T : Any> getConverter(targetType: Class<T>): Converter<Any, T> {
         return MyConverter(targetType)
     }
 
-    private inner class MyConverter<T>(val targetType: Class<T>) : Converter<Any, T> {
+    private inner class MyConverter<T : Any>(val targetType: Class<T>) : Converter<Any, T> {
         override fun convert(source: Any): T? {
             val r = JSON.to(targetType, source)
             return r
         }
     }
-
 }
 
 class IgnoreEmptyStringPropertyFilter : PropertyPreFilter {
     override fun process(writer: JSONWriter?, source: Any?, name: String?): Boolean {
-        if(source != null) {
+        if (source != null) {
             val v = name?.let { source::class.java.getDeclaredField(it) }
             v?.isAccessible = true
             val value = v?.get(source)
-            if(value is String && value.isBlank()) {
+            if (value is String && value.isBlank()) {
                 return false
             }
         }

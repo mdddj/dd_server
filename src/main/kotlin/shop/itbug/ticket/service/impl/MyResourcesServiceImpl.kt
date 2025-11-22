@@ -62,7 +62,7 @@ class MyResourcesServiceImpl : MyResourceService {
      */
     override fun findAll(pageModel: PageModel, myResources: MyResources?): Page<MyResources> {
         if(myResources==null){
-            return myResourcesRepository.findAll(pageModel.getPageable())
+            return myResourcesRepository.findAll(pageModel.getPageable().withSort(Sort.by("createDate").descending()))
         }
         val pageRequest = PageRequest.of(pageModel.getCurrentPage(), pageModel.pageSize, Sort.Direction.DESC, "id")
         return myResourcesRepository.findAll(Example.of(myResources), pageRequest)

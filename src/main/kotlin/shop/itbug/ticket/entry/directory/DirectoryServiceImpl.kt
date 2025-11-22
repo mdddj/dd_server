@@ -29,6 +29,7 @@ class DirectoryServiceImpl : DirectoryService {
         return directoryRepository.save(entity)
     }
 
+
     override fun deleteById(id: Long) {
         directoryRepository.deleteById(id)
     }
@@ -42,7 +43,12 @@ class DirectoryServiceImpl : DirectoryService {
     }
 
     @Transactional
-    @CacheEvict(RedisKeys.BLOG_KEY + "statistics", allEntries = true)
+    @Caching(
+        evict = [
+            CacheEvict(cacheNames = [RedisKeys.IDEA_DOC], key = "'all'"),
+            CacheEvict(cacheNames = [RedisKeys.BLOG_KEY + "statistics"], allEntries = true)
+        ]
+    )
     override fun saveDirectory(directoryDto: DirectoryDto, parentDirectory: DocDirectory?): DocDirectory {
         if (parentDirectory == null) {
             //验证是否存在
@@ -63,7 +69,10 @@ class DirectoryServiceImpl : DirectoryService {
         val savedDirectory = directoryRepository.save(directory)
 
         // 保存该目录下的文件
-        val files = directoryDto.files.map { MarkdownFile.create(it.name, it.content, savedDirectory, it.filename) }
+        val sortedFiles = directoryDto.files.sortedBy {
+            it.filename.split("\\.")[0].toIntOrNull() ?: 0
+        }
+        val files = sortedFiles.map { MarkdownFile.create(it.name, it.content, savedDirectory, it.filename) }
         markdownFileRepository.saveAll(files)
 
         // 递归保存子目录

@@ -23,14 +23,14 @@ const Page: React.FC = () => {
   const [content, setContent] = useState('');
 
   let updateId = searchParams.get('update');
-    const fetchBlogCategory = async () => {
+  const fetchBlogCategory = async () => {
     const result = await GetBlogCategorys();
     setCategoryList(result.data);
   };
 
   const updateBlog = async () => {
-    if(!updateId){
-      return
+    if (!updateId) {
+      return;
     }
     let result = await GetBlogById(updateId);
     setBlog(result.data);
@@ -114,7 +114,9 @@ const Page: React.FC = () => {
             </Select>
           </Form.Item>
           <Form.Item label={'正文'}>
-            <MarkdownEditor onChange={setContent} value={content} />
+            <MarkdownEditor onChange={setContent} value={content} onSubmit={async () => {
+              form.submit();
+            }} />
           </Form.Item>
           <Form.Item label={'别名'} name={'alias'}>
             <Input />

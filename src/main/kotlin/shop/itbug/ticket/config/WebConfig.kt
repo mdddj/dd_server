@@ -93,7 +93,6 @@ class WebConfig : WebMvcConfigurationSupport() {
                 JSONWriter.Feature.WriteEnumUsingToString,
                 JSONWriter.Feature.SortMapEntriesByKeys,
                 JSONWriter.Feature.WriteNullStringAsEmpty,
-                JSONWriter.Feature.ReferenceDetection
             )
             return config
         }

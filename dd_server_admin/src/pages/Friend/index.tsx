@@ -8,9 +8,8 @@ import {
   ProFormText,
   ProTable,
 } from '@ant-design/pro-components';
-import { Switch } from '@nextui-org/react';
 import { request } from '@umijs/max';
-import { Button, Popconfirm, Space } from 'antd';
+import { Button, Popconfirm, Space, Switch } from 'antd';
 import React, { ReactElement, useRef } from 'react';
 
 async function getList(params: any): Promise<Result<JpaPage<FriendLink>>> {
@@ -35,7 +34,7 @@ async function deleteFriend(id: number) {
 }
 
 export default function Page() {
-  const ref = useRef<ActionType>();
+  const ref = useRef<ActionType>(undefined);
   return (
     <PageContainer
       extra={[<AddFrom key={'add'} onSuccess={() => ref.current?.reload()} />]}
@@ -83,11 +82,11 @@ export default function Page() {
             render: (_, entity, __, action) => {
               return (
                 <Switch
-                  isSelected={entity.state === 1}
-                  onValueChange={async (isSelected) => {
+                  checked={entity.state===1}
+                  onChange={async (checked, event) => {
                     const r = await save({
                       ...entity,
-                      state: isSelected ? 1 : 0,
+                      state: checked ? 1 : 0,
                     });
                     if (r.success) {
                       action?.reload();

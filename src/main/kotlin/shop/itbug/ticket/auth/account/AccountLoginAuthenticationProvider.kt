@@ -6,7 +6,7 @@ import org.springframework.security.core.Authentication
 import shop.itbug.ticket.model.params.LoginParam
 import shop.itbug.ticket.service.UserService
 
-class AccountLoginAuthenticationProvider(val userService: UserService): DaoAuthenticationProvider() {
+class AccountLoginAuthenticationProvider(val userService: UserService): DaoAuthenticationProvider(userService) {
 
     override fun authenticate(authentication: Authentication): Authentication? {
         if(authentication.isAuthenticated){

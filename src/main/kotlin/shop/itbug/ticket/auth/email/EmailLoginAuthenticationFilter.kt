@@ -5,15 +5,16 @@ import com.alibaba.fastjson2.JSONObject
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletRequestWrapper
 import jakarta.servlet.http.HttpServletResponse
+import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationServiceException
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.core.Authentication
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher
 import shop.itbug.ticket.model.params.LoginParam
 
 class EmailLoginAuthenticationFilter :
-    AbstractAuthenticationProcessingFilter(AntPathRequestMatcher("/api/user-public/login-by-email", "POST")) {
+    AbstractAuthenticationProcessingFilter(PathPatternRequestMatcher.pathPattern(HttpMethod.POST,"/api/user-public/login-by-email")) {
 
     private val postOnly = true //只处理post请求
 

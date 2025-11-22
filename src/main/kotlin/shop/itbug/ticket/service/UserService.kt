@@ -1,6 +1,7 @@
 package shop.itbug.ticket.service
 
 import org.springframework.data.domain.Page
+import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.stereotype.Service
 import shop.itbug.ticket.admin.controller.AdminAuthController
 import shop.itbug.ticket.admin.model.PageModel
@@ -13,7 +14,7 @@ import shop.itbug.ticket.model.params.LoginParam
  * @author 梁典典
  */
 @Service
-interface UserService  {
+interface UserService : UserDetailsService {
     /**
      * 根据登录名字获取用户对象
      * @param loginNumber 用户账号名字

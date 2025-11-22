@@ -1,10 +1,13 @@
 package shop.itbug.ticket.entry
 
+import com.alibaba.fastjson2.annotation.JSONField
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.persistence.*
 import shop.itbug.ticket.entry.share.Share
 import shop.itbug.ticket.entry.useagent.MyUseAgent
 import java.util.*
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 /**
  * @author eee
@@ -22,6 +25,7 @@ open class MyResources  {
      */
     @ManyToOne
     @Schema(description="发布人")
+    @JSONField(serialize = false)
     open var user: User? = null
 
     @ManyToOne
@@ -47,7 +51,7 @@ open class MyResources  {
      * 发布时间
      */
     @Schema(description="发布时间")
-    open var createDate: Date? = null
+    open var createDate: Date? = Calendar.getInstance().time
 
     /**
      * 最后修改的一次时间
@@ -133,6 +137,8 @@ open class MyResources  {
     @Schema(description = "发布设备平台")
     open var platformString: String? = null
 
+
+    val publisher : UserDTO? get() = user?.toDTO()
 
 }
 

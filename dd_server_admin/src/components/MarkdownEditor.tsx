@@ -7,6 +7,9 @@ import MdEditor from 'react-markdown-editor-lite';
 import 'github-markdown-css/github-markdown-light.css';
 import 'highlight.js/styles/github.css';
 import 'react-markdown-editor-lite/lib/index.css';
+import Editor from 'react-markdown-editor-lite';
+import KbdMDPlugin from '@/components/plugins/KbdMDPlugin';
+import MarkdownEditorPluginForSubmitButton from '@/components/plugins/MarkdownEditorPluginForSubmitButton';
 
 const mdParser = new MarkdownIt({
   highlight: (str, lang) => {
@@ -19,16 +22,21 @@ const mdParser = new MarkdownIt({
   html: true,
 });
 
+Editor.use(KbdMDPlugin);
+Editor.use(MarkdownEditorPluginForSubmitButton);
+
 type Props = {
   onChange: (text: string) => void;
   value: string;
+  onSubmit?: () => Promise<void>;
 };
 
 /**
  * markdown富文本剪辑器
  * @constructor
  */
-const MarkdownEditor: React.FC<Props> = ({ onChange, value }) => {
+const MarkdownEditor: React.FC<Props> = ({ onChange, value, onSubmit }) => {
+
   return (
     <MdEditor
       className={'h-96 markdown-body'}
@@ -36,8 +44,10 @@ const MarkdownEditor: React.FC<Props> = ({ onChange, value }) => {
       onChange={({ text }) => onChange(text)}
       renderHTML={(text) => mdParser.render(text)}
       onImageUpload={uploadSimpleFile}
+      // @ts-ignore
+      onSubmit={onSubmit}
     ></MdEditor>
   );
 };
 
-export default MarkdownEditor
+export default MarkdownEditor;

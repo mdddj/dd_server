@@ -17,7 +17,7 @@ import kotlin.reflect.KClass
 
 private fun <T : Any> Setting.setByAny(model: T) {
     val json = JSON.parseObject(model.toJSONString())
-    json.forEach { t, u ->
+    json.forEach { (t, u) ->
         run {
             set(t, "$u")
         }

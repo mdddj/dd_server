@@ -52,7 +52,18 @@ interface ResourcesCategoryDao : JpaRepository<ResourcesCategory, Long>,
      * 根据type查询列表,这里会把动态数量查询出来
      */
     @Query(
-        value = "select r.*, count(rr.id) as resourceCount  from resources_category r  left join my_resources rr on r.id = rr.category_id where r.type = :type  group by r.id",
+        value = "select " +
+                "r.id, " +
+                "r.name, " +
+                "r.type, " +
+                "r.level, " +
+                "COALESCE(r.logo, '') as logo, " + // 如果 logo 是 NULL，返回空字符串 ''
+                "COALESCE(r.description, '') as description, " + // 如果 description 是 NULL，返回空字符串 ''
+                "count(rr.id) as resourceCount " +
+                "from resources_category r " +
+                "left join my_resources rr on r.id = rr.category_id " +
+                "where r.type = :type " +
+                "group by r.id, r.name, r.type, r.level, r.logo, r.description", // GROUP BY 也需要列出所有非聚合列
         nativeQuery = true
     )
     fun findAllByType(@Param("type") type: String): List<ResourcesCategoryCounter>

@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
+import shop.itbug.ticket.config.SearchConfigProperties
 import shop.itbug.ticket.dao.blog.BlogDao
 import shop.itbug.ticket.entry.blog.Blog
 import shop.itbug.ticket.entry.blog.Tag
@@ -45,6 +46,9 @@ class BlogServiceImpl : BlogService {
     @Resource
     private lateinit var directoryService: DirectoryService
 
+    @Resource
+    private lateinit var searchConfigProperties: SearchConfigProperties
+
     /**
      * 发布一篇博客
      *
@@ -67,7 +71,9 @@ class BlogServiceImpl : BlogService {
         blog.title = title
         blog.author = "梁典典"
         blog.category = category
-        return blogDao.save(blog)
+        val saved =  blogDao.save(blog)
+        searchConfigProperties.indexBlog(saved)
+        return saved
     }
 
     /**
@@ -109,7 +115,9 @@ class BlogServiceImpl : BlogService {
         if (tags != null) {
             blog.tags = tags
         }
-        return blogDao.save(blog)
+        val saved =  blogDao.save(blog)
+        searchConfigProperties.indexBlog(saved)
+        return saved
     }
 
     @Cacheable(RedisKeys.BLOG_KEY + "statistics")
@@ -139,6 +147,15 @@ class BlogServiceImpl : BlogService {
         statisticsResultModel.archiveModels = archiveModels
         statisticsResultModel.ideaDocs = ideaNames
         return statisticsResultModel
+    }
+
+
+    @CacheEvict(RedisKeys.BLOG_KEY + "selectById", key = "#id")
+    override fun addViewCount(id: Long) {
+        blogDao.findById(id).getOrNull()?.let {
+            it.viewCount = it.viewCount + 1
+            blogDao.save(it)
+        }
     }
 
     /**
@@ -172,6 +189,7 @@ class BlogServiceImpl : BlogService {
         ]
     )
     override fun delete(id: Long) {
+
         blogDao.deleteById(id)
     }
 

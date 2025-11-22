@@ -244,9 +244,11 @@ export default defineConfig({
     }
   ],
   npmClient: 'pnpm',
-  tailwindcss: {},
   title: "典典后台管理",
   esbuildMinifyIIFE: true,
+  extraPostCSSPlugins:[
+    require("@tailwindcss/postcss")
+  ],
   favicons: [
     "/favicon.ico",
   ],

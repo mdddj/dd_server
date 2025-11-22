@@ -10,12 +10,11 @@ import 'dayjs/locale/zh-cn';
 import GlobalAppBar from '@/components/GlobalAppBar';
 import { ApiGetCurrentUser } from '@/services/user/UserController';
 import { User } from '@/types/user';
-import { NextUIProvider } from '@nextui-org/react';
 import updateLocale from 'dayjs/plugin/updateLocale';
 import React from 'react';
 import { ToastType } from './types/result';
 import type { AxiosError } from "axios";
-
+import './main.css'
 dayjs.extend(updateLocale);
 dayjs.updateLocale('zh-cn', {
   weekStart: 0,
@@ -157,7 +156,7 @@ export function rootContainer(container: React.JSX.Element) {
   return (
     <App>
       <StyleProvider hashPriority="high">
-        <NextUIProvider>{container}</NextUIProvider>
+        {container}
       </StyleProvider>
     </App>
   );

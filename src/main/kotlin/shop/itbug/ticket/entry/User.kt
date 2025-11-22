@@ -41,14 +41,12 @@ enum class UserAccountType(val type: Int) {
 }
 
 
-
-
 /**
  * @author eee
  */
 @Entity
 @Schema(name = "用户类")
-open class User :UserDetails {
+open class User : UserDetails {
     /**
      * 用户id
      */
@@ -74,8 +72,8 @@ open class User :UserDetails {
     @Schema(description = "邮箱")
     open var email: String = ""
 
-    @Schema(description="用户介绍")
-    open var intro : String? = null
+    @Schema(description = "用户介绍")
+    open var intro: String? = null
 
     /**
      * 用户头像
@@ -97,7 +95,7 @@ open class User :UserDetails {
     open var userPassword: String = ""
 
     @Schema(description = "所在城市")
-    open var city : String = ""
+    open var city: String = ""
 
     @Schema(description = "工作")
     open var job: String = ""
@@ -122,7 +120,7 @@ open class User :UserDetails {
      * 2. 是,超级VIP
      * 3. 是特殊VIP
      */
-    @Schema(description = "是否为VIP会员,0. 不是,默认 1. 是,普通vip 2. 是,超级VIP 3. 是特殊VIP" )
+    @Schema(description = "是否为VIP会员,0. 不是,默认 1. 是,普通vip 2. 是,超级VIP 3. 是特殊VIP")
     open var vip: Int? = null
 
 
@@ -155,7 +153,7 @@ open class User :UserDetails {
      */
     @JsonIgnore
     @Schema(description = "激活邮箱的代码")
-    open var activeCode: String?  = null
+    open var activeCode: String? = null
 
     /**
      * 用户的权限列表
@@ -196,7 +194,6 @@ open class User :UserDetails {
     @SchemaProperty(name = "绑定公司")
     @Schema(description = "所属公司")
     open var enterprise: Enterprise? = null
-
 
 
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
@@ -250,11 +247,64 @@ open class User :UserDetails {
         val enterpriseId: Long? = null
     )
 
-    fun hasAdminRole() : Boolean {
+    fun hasAdminRole(): Boolean {
         return roles?.find { it.name == "admin" } != null
     }
 
-    fun getShowName() : String {
+    fun getShowName(): String {
         return "$email $nickName"
     }
+
+    fun toDTO(): UserDTO {
+        return toUserDTO(this)
+    }
+
+    companion object {
+
+        ///转dto
+        fun toUserDTO(user: User): UserDTO {
+            return UserDTO(
+                id = user.id,
+                loginNumber = user.loginNumber,
+                nickName = user.nickName,
+                email = user.email,
+                intro = user.intro,
+                picture = user.picture,
+                phone = user.phone,
+                city = user.city,
+                job = user.job,
+                loginTime = user.loginTime,
+                type = user.type,
+                vip = user.vip,
+                wallet = user.wallet,
+                openAiTokens = user.openAiTokens,
+                openAiFlag = user.openAiFlag,
+                status = user.status,
+                relationId = user.relationId,
+                enterprise = user.enterprise,
+            )
+        }
+    }
 }
+
+
+data class UserDTO(
+    val id: Long?,
+    val loginNumber: String,
+    val nickName: String,
+    val email: String,
+    val intro: String?,
+    val picture: String,
+    val phone: String?,
+    val city: String,
+    val job: String,
+    val loginTime: Date,
+    val type: Int?,
+    val vip: Int?,
+    val wallet: BigDecimal?,
+    val openAiTokens: BigInteger?,
+    val openAiFlag: Boolean?,
+    val status: Int?,
+    val relationId: String?,
+    val enterprise: Enterprise?,
+)

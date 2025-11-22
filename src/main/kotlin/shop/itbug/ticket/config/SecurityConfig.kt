@@ -72,7 +72,7 @@ class SecurityConfig {
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
 
         http
-            .httpBasic {
+            .httpBasic {_ ->
             }
             .cors {
                 it.configurationSource {

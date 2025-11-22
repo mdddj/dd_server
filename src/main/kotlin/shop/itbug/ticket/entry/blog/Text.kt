@@ -7,6 +7,7 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.Lob
 import jakarta.validation.constraints.NotBlank
+import shop.itbug.ticket.config.MeiliSearchBase
 import java.util.*
 
 /**
@@ -14,7 +15,7 @@ import java.util.*
  */
 @Entity
 @Schema(name = "字典")
-open class Text {
+open class Text: MeiliSearchBase {
     @Id
     @GeneratedValue
     @Schema(description = "主键ID")
@@ -68,4 +69,8 @@ open class Text {
 
     @Schema(description = "最后修改时间")
     open var updateDate: Date? = null
+    override fun getIndexData(): Map<String, String> {
+        return mapOf("key" to (name?:""),"content" to (context?:""))
+    }
 }
+

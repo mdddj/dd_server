@@ -10,11 +10,11 @@ import org.springframework.security.authentication.AuthenticationServiceExceptio
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.core.Authentication
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher
 import shop.itbug.ticket.model.params.LoginParam
 
 class AccountLoginAuthenticationFilter : AbstractAuthenticationProcessingFilter(
-    AntPathRequestMatcher.antMatcher(
+    PathPatternRequestMatcher.pathPattern(
         HttpMethod.POST, "/api/user-public/login"
     )
 ) {

@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.annotation.Resource
 import jakarta.validation.Valid
+import jakarta.websocket.server.PathParam
 import org.apache.commons.lang3.StringUtils
 import org.springframework.data.domain.Page
 import org.springframework.validation.BindingResult
@@ -11,6 +12,7 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import shop.itbug.ticket.admin.model.PageModel
 import shop.itbug.ticket.admin.model.getCurrentPage
+import shop.itbug.ticket.entry.MyResources
 import shop.itbug.ticket.entry.blog.Blog
 import shop.itbug.ticket.entry.blog.Category
 import shop.itbug.ticket.entry.blog.Text
@@ -19,6 +21,7 @@ import shop.itbug.ticket.entry.project.ProjectService
 import shop.itbug.ticket.exception.BizException
 import shop.itbug.ticket.exception.CommonEnum
 import shop.itbug.ticket.model.blog.*
+import shop.itbug.ticket.service.MyResourceService
 import shop.itbug.ticket.service.blog.BlogService
 import shop.itbug.ticket.service.blog.CategoryService
 import shop.itbug.ticket.service.blog.TagService
@@ -52,7 +55,11 @@ class BlogController {
     @Resource
     private lateinit var projectService: ProjectService
 
-    @Resource private lateinit var miniAppConfig: MiniAppConfig
+    @Resource
+    private lateinit var miniAppConfig: MiniAppConfig
+
+    @Resource
+    private lateinit var myResourceService: MyResourceService
 
     /**
      * 获取分类列表
@@ -68,11 +75,9 @@ class BlogController {
 
     @GetMapping("/categorys")
     @Operation(summary = "分页查询分类列表")
-    fun findBlogCategoryList(pageModel: PageModel,category: Category?) : R<Page<Category>> {
+    fun findBlogCategoryList(pageModel: PageModel, category: Category?): R<Page<Category>> {
         return categoryService.findAll(pageModel, category).successResult("获取成功")
     }
-
-
 
 
     /**
@@ -154,14 +159,19 @@ class BlogController {
 
     @GetMapping("/tag/blogs")
     @Operation(summary = "获取博客列表 (根据标签)")
-    fun getBlogsWithTagId(@Validated param: TagBlogsParam, bindingResult: BindingResult): Result<BlogUtil.CoverToPage<Blog>> {
+    fun getBlogsWithTagId(
+        @Validated param: TagBlogsParam,
+        bindingResult: BindingResult
+    ): Result<BlogUtil.CoverToPage<Blog>> {
         bindingResult.verify()
-        val blogsByTagId = param.page?.let { param.pageSize?.let { it1 ->
-            tagService.findBlogsByTagId(
-                param.tagId, it,
-                it1
-            )
-        } } ?: throw BizException("获取数据失败")
+        val blogsByTagId = param.page?.let {
+            param.pageSize?.let { it1 ->
+                tagService.findBlogsByTagId(
+                    param.tagId, it,
+                    it1
+                )
+            }
+        } ?: throw BizException("获取数据失败")
         val stringObjectMap = BlogUtil.coverToPage(blogsByTagId)
         return Result(stringObjectMap, "获取成功")
     }
@@ -179,13 +189,16 @@ class BlogController {
         if (bindingResult.hasErrors()) {
             return Result.paramValidError(bindingResult)
         }
-        val blogs = param?.categoryId?.let { param.page?.let { it1 ->
-            param.pageSize?.let { it2 ->
-                blogService.selectBlogsWithCategoryId(it,
-                    it1, it2
-                )
+        val blogs = param?.categoryId?.let {
+            param.page?.let { it1 ->
+                param.pageSize?.let { it2 ->
+                    blogService.selectBlogsWithCategoryId(
+                        it,
+                        it1, it2
+                    )
+                }
             }
-        } } ?: throw BizException("获取数据失败")
+        } ?: throw BizException("获取数据失败")
         return Result(BlogUtil.coverToPage(blogs), "获取成功")
     }
 
@@ -256,7 +269,7 @@ class BlogController {
 
         //匹配用户用户的密码是否正确
         if (passwordView) {
-            password?:throw BizException("请输入密码")
+            password ?: throw BizException("请输入密码")
             val verificationPasswordIsSuccess = textService.verificationPassword(password, name)
             if (!verificationPasswordIsSuccess) {
                 return Result<Any>(303, "密码错误.")
@@ -283,19 +296,19 @@ class BlogController {
 
     @GetMapping("/all")
     @Operation(summary = "获取全部博客")
-    fun getAllBlogs() : R<List<Blog>>{
+    fun getAllBlogs(): R<List<Blog>> {
         return blogService.findAll().successResult()
     }
 
     @GetMapping("/getTextAll")
     @Operation(summary = "获取所有的字典")
-    fun getAllText() : R<List<Text>>{
+    fun getAllText(): R<List<Text>> {
         return textService.findAll().successResult()
     }
 
     @GetMapping("/projects")
     @Operation(summary = "获取所有项目列表")
-    fun findAllProjects() : R<List<Project>> {
+    fun findAllProjects(): R<List<Project>> {
         return projectService.findAll().successResult("获取成功")
     }
 
@@ -303,5 +316,18 @@ class BlogController {
     @Operation(summary = "典典博客小程序的配置")
     fun getMiniAppConfig(): R<MiniAppConfigModel> = miniAppConfig.setting.successResult()
 
+
+    @Operation(summary = "获取所有的动态")
+    @GetMapping("/resources-list")
+    fun findAllResource(pageModel: PageModel): Result<BlogUtil.CoverToPage<MyResources>> {
+        val findAll = myResourceService.findAll(pageModel, null)
+        return R.ok(findAll.toMyPageResult())
+    }
+
+    @Operation(summary = "获取动态详情")
+    @GetMapping("/resources/{id}")
+    fun findResource(@PathVariable  id: Long): R<MyResources> {
+        return myResourceService.findById(id)?.successResult() ?: throw BizException(CommonEnum.NOT_FOUND)
+    }
 
 }

@@ -2,6 +2,7 @@ package shop.itbug.ticket.entry.blog
 
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.persistence.*
+import shop.itbug.ticket.config.MeiliSearchBase
 import java.io.Serializable
 import java.util.*
 
@@ -12,7 +13,7 @@ import java.util.*
  */
 @Entity
 @Schema(name = "博客")
-open class Blog : Serializable {
+open class Blog : Serializable,MeiliSearchBase {
     @Id
     @GeneratedValue
     @Schema(description = "主键ID")
@@ -20,7 +21,6 @@ open class Blog : Serializable {
 
     @Schema(description = "标题")
     open var title: String? = null
-
 
     @Lob
     @Column(columnDefinition = "LONGTEXT")
@@ -62,4 +62,11 @@ open class Blog : Serializable {
     @Lob
     @Column(columnDefinition = "LONGTEXT")
     open var html: String? = null
+
+    @Schema(description = "浏览数量")
+    open var viewCount: Long = 0
+
+    override fun getIndexData(): Map<String, String> {
+        return mapOf<String, String>("id" to "$id", "title" to (title ?: ""), "content" to (content ?: ""))
+    }
 }

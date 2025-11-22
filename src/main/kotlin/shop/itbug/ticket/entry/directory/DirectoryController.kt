@@ -20,15 +20,10 @@ class DirectoryController {
         return directoryService.saveDirectory(directoryDto).successResult("保存笔记成功")
     }
 
-
     @DeleteMapping("/{name}")
     @Operation(summary = "删除项目")
     fun deleteByName( @PathVariable(name = "name") name: String): R<Boolean> {
         directoryService.deleteByName(name)
         return R.ok(true,"删除成功")
     }
-
-
-
-
 }

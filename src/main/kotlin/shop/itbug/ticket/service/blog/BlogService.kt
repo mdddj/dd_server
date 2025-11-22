@@ -138,4 +138,9 @@ interface BlogService {
      * 获取博客统计数据
      */
     fun getDataStatistics(): StatisticsResultModel
+
+    /**
+     * 增加博客浏览量
+     */
+    fun addViewCount(id: Long)
 }

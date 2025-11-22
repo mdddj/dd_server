@@ -59,3 +59,8 @@ server:
     uri-encoding: UTF-8
 dd-server-config:
   root-dir: .dd
+
+
+meilisearch:
+  host: https://search.itbug.shop
+  key: HmPEKZhcoANzRt3DTPhRQVRxPEVZw7m2TymKwKhs_2ibtMf

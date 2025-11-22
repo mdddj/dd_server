@@ -6,7 +6,7 @@ import shop.itbug.ticket.model.api.CachePage
 import shop.itbug.ticket.model.blog.SimplePage
 import java.util.*
 typealias MyPageResult<T> = BlogUtil.CoverToPage<T>
-fun <T> Page<T>.toMyPageResult(): BlogUtil.CoverToPage<T> {
+fun <T : Any> Page<T>.toMyPageResult(): BlogUtil.CoverToPage<T> {
     return BlogUtil.coverToPage(this)
 }
 /**
@@ -26,7 +26,7 @@ object BlogUtil {
     }
 
     data class CoverToPage<T>(val list: List<T>,val page: SimplePage)
-    fun <T> coverToPage(page: Page<T>): CoverToPage<T> {
+    fun <T : Any> coverToPage(page: Page<T>): CoverToPage<T> {
         val content = page.content
         val simplePage = SimplePage()
         simplePage.pageSize = page.size
@@ -38,7 +38,7 @@ object BlogUtil {
         val paged = page.isLast
         simplePage.hasPrevious = b
         simplePage.isPaged = paged
-        return  CoverToPage<T>(content,simplePage)
+        return  CoverToPage(content,simplePage)
     }
 
     fun <T> coverToPageByCache(page: CachePage<T>): CoverToPage<T> {

@@ -12,3 +12,6 @@ cloud_messageing.iws
 /.umi-test
 /.mfsu
 .swc
+
+
+dist/

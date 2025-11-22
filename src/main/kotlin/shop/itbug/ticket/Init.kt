@@ -6,6 +6,7 @@ import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.core.io.ResourceLoader
 import org.springframework.stereotype.Component
+import shop.itbug.ticket.config.SearchConfigProperties
 import shop.itbug.ticket.constant.TextConstant
 import shop.itbug.ticket.entry.ResourcesCategory
 import shop.itbug.ticket.entry.Role
@@ -16,6 +17,7 @@ import shop.itbug.ticket.service.*
 import shop.itbug.ticket.service.blog.BlogService
 import shop.itbug.ticket.service.blog.CategoryService
 import shop.itbug.ticket.service.blog.TagService
+import shop.itbug.ticket.service.blog.TextService
 import java.io.IOException
 import java.nio.charset.StandardCharsets
 
@@ -46,6 +48,12 @@ class InitAppRunner : ApplicationRunner {
     @Resource
     private lateinit var systemAvatarService: SystemAvatarService
 
+    @Resource
+    private lateinit var searchConfigProperties: SearchConfigProperties
+
+    @Resource
+    private lateinit var textService: TextService
+
     @Throws(IOException::class)
     override fun run(args: ApplicationArguments) {
         roleInit()
@@ -55,6 +63,17 @@ class InitAppRunner : ApplicationRunner {
         rcInit()
         initPics()
         checkAdminAccount() //
+        indexBlogs()
+        indexTexts()
+    }
+
+    private fun indexTexts() {
+        searchConfigProperties.indexData("texts",textService.findAll())
+    }
+
+    private fun indexBlogs() {
+        val all = blogService.findAll()
+        searchConfigProperties.indexBlogs(all)
     }
 
     /**
