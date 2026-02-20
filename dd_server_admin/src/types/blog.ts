@@ -18,6 +18,7 @@ export interface Blog {
   thumbnail: string;
   title: string;
   html: string;
+  description: string | undefined;
 }
 
 export interface BlogTag {

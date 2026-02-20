@@ -22,7 +22,9 @@ repositories {
     maven { url = uri("https://repo.spring.io/snapshot") }
 }
 
-//val sbVersion = "3.5.5"
+val koogVersion = "0.3.0"
+val testVersion = "6.1.0-M1"
+
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
@@ -32,7 +34,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-websocket")
-    testCompileOnly("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     compileOnly("org.springframework.boot:spring-boot-devtools")
     implementation("org.jetbrains.kotlin:kotlin-stdlib:latest.release")
@@ -54,13 +56,16 @@ dependencies {
     implementation("com.github.oshi:oshi-core:latest.release")
     implementation("com.meilisearch.sdk:meilisearch-java:latest.release")
     implementation(kotlin("reflect"))
-//    implementation(project(":zhetao_sdk"))
     if (osdetector.classifier == "osx-aarch_64") {
         runtimeOnly("io.netty:netty-resolver-dns-native-macos:4.1.77.Final:${osdetector.classifier}")
     }
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:2.3.0-RC")
-    testImplementation("org.junit.platform:junit-platform-engine:1.13.4")
+
+    //测试
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:${testVersion}")
+    testImplementation("org.junit.platform:junit-platform-engine:${testVersion}")
+
+    // ai
+    implementation("ai.koog:koog-agents:${koogVersion}")
 }
 
 

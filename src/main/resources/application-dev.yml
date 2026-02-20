@@ -51,6 +51,7 @@ spring:
   threads:
     virtual:
       enabled: true
+
 logging:
   level:
     com.ldx.redis.service.impl: debug
@@ -61,7 +62,6 @@ server:
     uri-encoding: UTF-8
 dd-server-config:
   root-dir: .dd
-
 
 
 meilisearch:

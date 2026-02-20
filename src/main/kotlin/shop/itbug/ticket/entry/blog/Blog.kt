@@ -45,6 +45,11 @@ open class Blog : Serializable,MeiliSearchBase {
     @Schema(description = "发布时间")
     open var dateString: String? = null
 
+    @Schema(description = "描述")
+    @Column(columnDefinition = "LONGTEXT")
+    @Lob
+    open var description: String? = null
+
     @Schema(description = "文章标签")
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

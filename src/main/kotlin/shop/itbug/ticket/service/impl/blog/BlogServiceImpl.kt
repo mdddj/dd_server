@@ -2,6 +2,7 @@ package shop.itbug.ticket.service.impl.blog
 
 import cn.hutool.core.date.DateUtil
 import jakarta.annotation.Resource
+import kotlinx.coroutines.runBlocking
 import org.springframework.cache.annotation.CacheConfig
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
@@ -15,11 +16,13 @@ import shop.itbug.ticket.dao.blog.BlogDao
 import shop.itbug.ticket.entry.blog.Blog
 import shop.itbug.ticket.entry.blog.Tag
 import shop.itbug.ticket.entry.directory.DirectoryService
+import shop.itbug.ticket.ex.log
 import shop.itbug.ticket.exception.BizException
 import shop.itbug.ticket.exception.CommonEnum
 import shop.itbug.ticket.model.api.CachePage
 import shop.itbug.ticket.model.api.cache
 import shop.itbug.ticket.model.blog.*
+import shop.itbug.ticket.service.AiService
 import shop.itbug.ticket.service.blog.BlogService
 import shop.itbug.ticket.service.blog.CategoryService
 import shop.itbug.ticket.service.blog.TagService
@@ -32,6 +35,7 @@ import kotlin.jvm.optionals.getOrNull
 @CacheConfig(cacheNames = ["blog"])
 class BlogServiceImpl : BlogService {
 
+    private val logger = this.log()
 
     @Resource
     private lateinit var blogDao: BlogDao
@@ -48,6 +52,9 @@ class BlogServiceImpl : BlogService {
 
     @Resource
     private lateinit var searchConfigProperties: SearchConfigProperties
+
+    @Resource
+    private lateinit var aiService: AiService
 
     /**
      * 发布一篇博客
@@ -71,7 +78,7 @@ class BlogServiceImpl : BlogService {
         blog.title = title
         blog.author = "梁典典"
         blog.category = category
-        val saved =  blogDao.save(blog)
+        val saved = blogDao.save(blog)
         searchConfigProperties.indexBlog(saved)
         return saved
     }
@@ -115,9 +122,44 @@ class BlogServiceImpl : BlogService {
         if (tags != null) {
             blog.tags = tags
         }
-        val saved =  blogDao.save(blog)
+        val saved = blogDao.save(blog)
         searchConfigProperties.indexBlog(saved)
         return saved
+    }
+
+    @Caching(
+        evict = [
+            CacheEvict(
+                value = [
+                    RedisKeys.BLOG_KEY + "all",
+                    RedisKeys.BLOG_KEY + "statistics",
+                    RedisKeys.BLOG_KEY + "count",
+                    RedisKeys.BLOG_KEY + "pageable-select",
+                    RedisKeys.BLOG_KEY + "monthCount",
+                    RedisKeys.BLOG_KEY + "getMonthBlogsWithMonth",
+                    RedisKeys.BLOG_KEY + "selectById"
+                ], allEntries = true
+            )
+        ]
+    )
+    override fun invalidateBlogs() {
+        logger.info("手动清理所有博客相关的缓存")
+    }
+
+    override fun useAiGenerateIntroduction(blogId: Long, force: Boolean) {
+        logger.info("开始使用 ai生成博客简介,blog id $blogId")
+        val blog = blogDao.findById(blogId).getOrNull() ?: throw BizException(CommonEnum.NOT_FOUND)
+        val content = blog.content
+        if (!force && !blog.description.isNullOrBlank()) {
+            logger.info("博客已经有总结,忽略")
+            return
+        }
+        val msg: String = runBlocking {
+            aiService.generate("下面是博客的文本,帮我生成总结,博客文本:${content}")
+        }
+        logger.info("博客:${blog.title}生成 AI描述成功:${msg}")
+        blog.description = msg
+        blogDao.save(blog)
     }
 
     @Cacheable(RedisKeys.BLOG_KEY + "statistics")
@@ -153,7 +195,7 @@ class BlogServiceImpl : BlogService {
     @CacheEvict(RedisKeys.BLOG_KEY + "selectById", key = "#id")
     override fun addViewCount(id: Long) {
         blogDao.findById(id).getOrNull()?.let {
-            it.viewCount = it.viewCount + 1
+            it.viewCount += 1
             blogDao.save(it)
         }
     }

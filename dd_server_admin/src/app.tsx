@@ -15,28 +15,12 @@ import React from 'react';
 import { ToastType } from './types/result';
 import type { AxiosError } from "axios";
 import './main.css'
+import { ApiError, ResponseStructure } from '@/utils/ApiError';
 dayjs.extend(updateLocale);
 dayjs.updateLocale('zh-cn', {
   weekStart: 0,
 });
 
-interface ResponseStructure {
-  state: number;
-  data: any;
-  message: string;
-  success: boolean;
-  type: ToastType;
-}
-
-class ApiError extends Error {
-  info: ResponseStructure;
-
-  constructor(res: ResponseStructure) {
-    super(res.message);
-    super.name = 'BizError';
-    this.info = res;
-  }
-}
 
 export interface AppInitialStateModel {
   user?: User;

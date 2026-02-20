@@ -1,3 +1,8 @@
 spring:
   profiles:
     active: dev
+ai:
+  api-key: sk-zxhqdxlnawmagcvisckjaabbkhfvtptqwpkfxlkfwrepqhvt
+  base-url: https://api.siliconflow.cn
+  model: MiniMaxAI/MiniMax-M2
+  blog-description-length: 100

@@ -143,4 +143,16 @@ interface BlogService {
      * 增加博客浏览量
      */
     fun addViewCount(id: Long)
+
+    /**
+     * 使用 ai生成博客的介绍
+     * @param force 是否强制更新, 如果博客已经有总结的了,则忽略, 设置为 true,则不进行判断
+     */
+    fun useAiGenerateIntroduction(blogId: Long,force: Boolean = true)
+
+
+    /**
+     * 清理所有的博客缓存
+     */
+    fun invalidateBlogs()
 }

@@ -2,6 +2,11 @@ package shop.itbug.ticket
 
 import cn.hutool.core.io.IoUtil
 import jakarta.annotation.Resource
+import kotlinx.coroutines.CompletableJob
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.core.io.ResourceLoader
@@ -20,10 +25,13 @@ import shop.itbug.ticket.service.blog.TagService
 import shop.itbug.ticket.service.blog.TextService
 import java.io.IOException
 import java.nio.charset.StandardCharsets
+import kotlin.coroutines.CoroutineContext
 
 ///
 @Component
-class InitAppRunner : ApplicationRunner {
+class InitAppRunner : ApplicationRunner, CoroutineScope {
+    private val logger = this.log()
+
     @Resource
     private lateinit var userService: UserService
 
@@ -54,6 +62,9 @@ class InitAppRunner : ApplicationRunner {
     @Resource
     private lateinit var textService: TextService
 
+    private val job = SupervisorJob()
+
+
     @Throws(IOException::class)
     override fun run(args: ApplicationArguments) {
         roleInit()
@@ -64,11 +75,31 @@ class InitAppRunner : ApplicationRunner {
         initPics()
         checkAdminAccount() //
         indexBlogs()
-        indexTexts()
+        launch {
+            indexTexts()
+        }
+        updateAllBlogDescription()
+    }
+
+    private fun updateAllBlogDescription() {
+        logger.info("开始 AI生成博客描述.")
+        val blogs = blogService.findAll()
+        launch {
+            blogs.forEach { blog ->
+                blog.id?.let {
+                    try {
+                        blogService.useAiGenerateIntroduction(blogId = it, false)
+                    } catch (e: Exception) {
+                        logger.warn("总结博客失败:${e}")
+                    }
+                }
+            }
+        }
+
     }
 
     private fun indexTexts() {
-        searchConfigProperties.indexData("texts",textService.findAll())
+        searchConfigProperties.indexData("texts", textService.findAll())
     }
 
     private fun indexBlogs() {
@@ -253,6 +284,9 @@ class InitAppRunner : ApplicationRunner {
         }
         return tagService.save(hashSet)
     }
+
+    override val coroutineContext: CoroutineContext
+        get() = job + Dispatchers.IO
 
 
 }

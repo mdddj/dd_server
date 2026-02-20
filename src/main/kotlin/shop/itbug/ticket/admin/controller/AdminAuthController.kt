@@ -127,6 +127,23 @@ class AdminAuthController {
         }
     }
 
+    @PostMapping("/ai-generate-desc")
+    @Operation(summary = "使用AI总结博客内容")
+    fun updateBlogDesc(@RequestBody idBody: IdBody): Result<Boolean> {
+        try {
+            blogService.useAiGenerateIntroduction(idBody.id, true)
+            return Result.ok(true)
+        } catch (e: Exception) {
+            throw BizException(e)
+        }
+    }
+
+    @PostMapping("/invalidate-blog-cache")
+    @Operation(summary = "清理所有的博客缓存")
+    fun invalidateBlogs() {
+        blogService.invalidateBlogs()
+    }
+
     /**
      * 发布一篇新博客
      *
@@ -141,26 +158,26 @@ class AdminAuthController {
             return if (params.id != null) {
                 val category = params.categoryId?.let { categoryService.select(it) }
                 val updateBlog = blogService.select(params.id)
-                if(params.tags.isNotEmpty()){
+                if (params.tags.isNotEmpty()) {
                     val tagsSet = HashSet<BlogTag>()
                     params.tags.forEach(Consumer { s: String -> tagsSet.add(BlogTag(s)) })
                     val save = tagService.save(tagsSet)
-                    if(save.isNotEmpty()){
+                    if (save.isNotEmpty()) {
                         updateBlog.tags = save
                     }
                 }
                 updateBlog.title = params.title
                 updateBlog.content = params.content
-                if(category!=null){
+                if (category != null) {
                     updateBlog.category = category
                 }
-                if(params.alias.isNotBlank()){
+                if (params.alias.isNotBlank()) {
                     updateBlog.aliasString = params.alias
                 }
-                if(params.html.isNotBlank()){
+                if (params.html.isNotBlank()) {
                     updateBlog.html = params.html
                 }
-                if(params.thumbnail.isNotBlank()){
+                if (params.thumbnail.isNotBlank()) {
                     updateBlog.thumbnail = params.thumbnail
                 }
 
@@ -340,7 +357,7 @@ class AdminAuthController {
         @RequestBody @Validated myResources: MyResources
     ): Result<*> {
         val model = myResourceService.findById(myResources.id!!) ?: throw BizException("获取动态数据失败")
-        model.updateDate = model.id?.let {_ -> DateUtil.date() } //修改更新时间
+        model.updateDate = model.id?.let { _ -> DateUtil.date() } //修改更新时间
         myResources.content?.let { model.content = it }//修改正文内容
         myResources.label?.let { model.label = it }  //修改标签
         myResources.title?.let { model.title = it } //修改标题

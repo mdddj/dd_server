@@ -1,0 +1,11 @@
+[versions]
+kotlin = "2.3.0-RC"
+springBoot = "4.0.1-SNAPSHOT"
+
+[plugins]
+jb-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+jb-kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
+jb-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+jb-kotlin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.ref = "kotlin" }
+
+spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
